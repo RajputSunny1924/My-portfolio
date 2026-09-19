@@ -14,9 +14,7 @@ class RegisterResponse(BaseModel):
     user_id:int
 
 class LoginResponse(BaseModel):
-    message:str
-    access_token:str
-    token_type:str
+    message: str
 
 class VerifyEmail(BaseModel):
     email: str

@@ -1,60 +1,69 @@
 import { useEffect, useState } from "react";
 
 function App() {
-  // Decide which form to show
-  const [showLogin, setShowLogin] = useState(true);
+  // -------------------------
+  // Authentication states
+  // -------------------------
 
-  // Authentication state
+  const [showLogin, setShowLogin] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // Registration form data
+  // -------------------------
+  // Registration data
+  // -------------------------
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  // Login form data
+  // -------------------------
+  // Login data
+  // -------------------------
+
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
 
-  // Email verification data
+  // -------------------------
+  // Verification data
+  // -------------------------
+
   const [verificationData, setVerificationData] = useState({
     email: "",
     otp: "",
   });
 
-  // Decide whether verification form should be shown
   const [showVerification, setShowVerification] = useState(false);
 
-  // Check authentication using saved JWT
+  // -------------------------
+  // Selected project
+  // -------------------------
+
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  // -------------------------
+  // Check authentication
+  // -------------------------
+
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("access_token");
-
-      if (!token) {
-        setCheckingAuth(false);
-        return;
-      }
-
       try {
-        const response = await fetch("http://127.0.0.1:8000/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await fetch("http://localhost:8000/profile", {
+          credentials: "include",
         });
 
         if (response.ok) {
           setIsLoggedIn(true);
         } else {
-          localStorage.removeItem("access_token");
           setIsLoggedIn(false);
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
+
         setIsLoggedIn(false);
       }
 
@@ -64,13 +73,50 @@ function App() {
     checkAuth();
   }, []);
 
+  // Reveal content only when it enters the viewport. The class-based approach
+  // keeps the animation behaviour separate from the portfolio content.
+  useEffect(() => {
+    if (!isLoggedIn) return undefined;
+
+    const revealItems = document.querySelectorAll("[data-reveal]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.14, rootMargin: "0px 0px -42px" },
+    );
+
+    revealItems.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
+  }, [isLoggedIn]);
+
+  // -------------------------
   // Logout
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    setIsLoggedIn(false);
+  // -------------------------
+
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:8000/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      setIsLoggedIn(false);
+      setSelectedProject(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
-  // Handle registration input changes
+  // -------------------------
+  // Registration input
+  // -------------------------
+
   const handleRegisterChange = (event) => {
     setFormData({
       ...formData,
@@ -78,7 +124,10 @@ function App() {
     });
   };
 
-  // Handle login input changes
+  // -------------------------
+  // Login input
+  // -------------------------
+
   const handleLoginChange = (event) => {
     setLoginData({
       ...loginData,
@@ -86,12 +135,15 @@ function App() {
     });
   };
 
-  // Handle registration
+  // -------------------------
+  // Registration
+  // -------------------------
+
   const handleRegister = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/register", {
+      const response = await fetch("http://localhost:8000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,12 +176,15 @@ function App() {
     }
   };
 
-  // Handle email verification
+  // -------------------------
+  // Email verification
+  // -------------------------
+
   const handleVerifyEmail = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/verify-email", {
+      const response = await fetch("http://localhost:8000/verify-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -157,16 +212,20 @@ function App() {
     }
   };
 
-  // Handle login
+  // -------------------------
+  // Login
+  // -------------------------
+
   const handleLogin = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/login", {
+      const response = await fetch("http://localhost:8000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(loginData),
       });
 
@@ -175,9 +234,12 @@ function App() {
       console.log("Login response:", data);
 
       if (response.ok) {
-        localStorage.setItem("access_token", data.access_token);
-
         setIsLoggedIn(true);
+
+        setLoginData({
+          email: "",
+          password: "",
+        });
       } else {
         console.error("Login failed:", data.detail);
       }
@@ -186,45 +248,55 @@ function App() {
     }
   };
 
-  // Show loading while checking existing token
-  if (checkingAuth) {
-    return <h2>Checking authentication...</h2>;
-  }
+  // -------------------------
+  // Loading screen
+  // -------------------------
 
-  // Logged-in page
-  if (isLoggedIn) {
+  if (checkingAuth) {
     return (
       <div>
-        <h1>My Portfolio</h1>
-
-        <h2>Welcome to my portfolio</h2>
-
-        <p>You have successfully logged in.</p>
-
-        <button onClick={handleLogout}>Logout</button>
+        <h2>Checking authentication...</h2>
       </div>
     );
   }
 
-  return (
-    <div>
-      <h1>My Portfolio</h1>
+  // =====================================================
+  // LOGIN / REGISTER SCREEN
+  // =====================================================
 
-      {/* Email Verification */}
-      {showVerification ? (
-        <div>
-          <h2>Verify Your Email</h2>
+  if (!isLoggedIn) {
+    return (
+      <div>
+        <h1>My PortFolio</h1>
 
-          <p>OTP has been sent to {verificationData.email}</p>
+        {/* -------------------------
+            Verification Form
+        ------------------------- */}
 
-          <form onSubmit={handleVerifyEmail}>
-            <div>
-              <label>OTP</label>
+        {showVerification ? (
+          <div>
+            <h2>Verify Your Email</h2>
+
+            <p>OTP has been sent to your email.</p>
+
+            <form onSubmit={handleVerifyEmail}>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={verificationData.email}
+                onChange={(event) =>
+                  setVerificationData({
+                    ...verificationData,
+                    email: event.target.value,
+                  })
+                }
+              />
 
               <input
                 type="text"
                 name="otp"
-                placeholder="Enter 6-digit OTP"
+                placeholder="Enter OTP"
                 value={verificationData.otp}
                 onChange={(event) =>
                   setVerificationData({
@@ -233,101 +305,795 @@ function App() {
                   })
                 }
               />
-            </div>
 
-            <button type="submit">Verify Email</button>
-          </form>
+              <button type="submit">Verify Email</button>
+            </form>
+          </div>
+        ) : showLogin ? (
+          /* -------------------------
+             Login Form
+          ------------------------- */
+
+          <div>
+            <h2>Login</h2>
+
+            <form onSubmit={handleLogin}>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={loginData.email}
+                onChange={handleLoginChange}
+              />
+
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={loginData.password}
+                onChange={handleLoginChange}
+              />
+
+              <button type="submit">Login</button>
+            </form>
+
+            <p>Don't have an account?</p>
+
+            <button onClick={() => setShowLogin(false)}>Create Account</button>
+          </div>
+        ) : (
+          /* -------------------------
+             Registration Form
+          ------------------------- */
+
+          <div>
+            <h2>Create Account</h2>
+
+            <form onSubmit={handleRegister}>
+              <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={formData.name}
+                onChange={handleRegisterChange}
+              />
+
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleRegisterChange}
+              />
+
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleRegisterChange}
+              />
+
+              <button type="submit">Register</button>
+            </form>
+
+            <p>Already have an account?</p>
+
+            <button onClick={() => setShowLogin(true)}>Login</button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // =====================================================
+  // PROJECT DATA
+  // =====================================================
+
+  const projects = [
+    {
+      id: 1,
+      title: "Full Stack Authentication Project",
+      tech: "React • FastAPI • MySQL • SQLAlchemy • JWT",
+
+      description:
+        "A secure full-stack authentication system with user registration, email OTP verification, password hashing, JWT authentication and protected backend APIs.",
+
+      features: [
+        "User registration and login",
+        "Email OTP verification",
+        "Argon2 password hashing",
+        "JWT authentication",
+        "HttpOnly cookie-based authentication",
+        "Protected API endpoints",
+        "React frontend connected with FastAPI",
+        "SQLAlchemy database operations",
+      ],
+
+      architecture: `React Frontend
+      ↓
+FastAPI API
+      ↓
+Authentication Logic
+      ↓
+SQLAlchemy
+      ↓
+MySQL`,
+
+      structure: `frontend/
+├── App.jsx
+├── App.css
+└── main.jsx
+
+backend/
+├── main.py
+├── database.py
+├── models.py
+└── schemas.py`,
+
+      flowTitle: "Authentication Flow",
+
+      flow: `Register
+   ↓
+Generate OTP
+   ↓
+Hash Password + OTP
+   ↓
+Save User
+   ↓
+Email Verification
+   ↓
+Login
+   ↓
+Create JWT
+   ↓
+HttpOnly Cookie
+   ↓
+Protected API`,
+
+      security: [
+        "Passwords are stored as Argon2 hashes.",
+        "Email OTP is generated securely and stored as a hash.",
+        "OTP verification uses an expiry time.",
+        "JWT is stored inside an HttpOnly cookie.",
+        "Protected endpoints verify the authentication cookie.",
+        "CORS is configured for frontend-backend communication.",
+      ],
+
+      apis: [
+        "POST /register",
+        "POST /verify-email",
+        "POST /login",
+        "GET /profile",
+        "POST /logout",
+      ],
+
+      problems: [
+        "Frontend and backend initially used different hostnames for cookie communication.",
+        "Using localhost consistently fixed the cookie issue.",
+        "Authentication state is checked when the React application starts.",
+      ],
+
+      future: [
+        "CSRF protection",
+        "HTTPS with Secure cookies",
+        "Rate limiting",
+        "Password reset",
+        "Role-based authorization",
+      ],
+    },
+
+    {
+      id: 2,
+      title: "JARVIS AI Desktop Assistant",
+      tech: "Python • React • FastAPI • WebSocket",
+
+      description:
+        "An AI desktop assistant that connects a React interface with a Python and FastAPI backend to process voice commands and perform desktop, browser and application operations.",
+
+      features: [
+        "Voice command interaction",
+        "Desktop operations",
+        "Browser operations",
+        "Application operations",
+        "React frontend",
+        "FastAPI backend",
+        "Real-time WebSocket communication",
+      ],
+
+      architecture: `React Frontend
+      ↓
+WebSocket Connection
+      ↓
+FastAPI Backend
+      ↓
+Python Assistant Logic
+      ↓
+Desktop / Browser / Applications`,
+
+      structure: `frontend/
+└── React Interface
+
+backend/
+├── FastAPI
+├── WebSocket
+└── Python Assistant Logic`,
+
+      flowTitle: "Communication Flow",
+
+      flow: `User Command
+      ↓
+React Interface
+      ↓
+WebSocket
+      ↓
+FastAPI
+      ↓
+Python Logic
+      ↓
+System / Browser / Application`,
+
+      problems: [
+        "Real-time interaction requires continuous communication between frontend and backend.",
+        "WebSocket communication was used instead of making every interaction a separate HTTP request.",
+      ],
+
+      future: [
+        "More desktop automation",
+        "More application integrations",
+        "Improved AI task handling",
+      ],
+    },
+
+    {
+      id: 3,
+      title: "Private Chat Application",
+      tech: "React • FastAPI • MySQL • WebSocket • JWT",
+
+      description:
+        "A private two-user chat application with authentication, real-time messaging, database-backed messages and media-related functionality.",
+
+      features: [
+        "User authentication",
+        "Private two-user messaging",
+        "Real-time messaging",
+        "WebSocket communication",
+        "MySQL message storage",
+        "Online and offline status",
+        "Media functionality",
+      ],
+
+      architecture: `React Chat Interface
+      ↓
+FastAPI Backend
+      ↓
+WebSocket Connection
+      ↓
+Chat Processing
+      ↓
+MySQL Database`,
+
+      structure: `frontend/
+├── React UI
+├── Authentication
+└── Chat Interface
+
+backend/
+├── FastAPI
+├── Authentication
+├── WebSocket
+├── Database Logic
+└── Media Handling
+
+database/
+└── MySQL`,
+
+      flowTitle: "Real-Time Messaging Flow",
+
+      flow: `User A
+  ↓
+React
+  ↓
+WebSocket
+  ↓
+FastAPI
+  ↓
+Chat Processing
+  ↓
+MySQL
+  ↓
+WebSocket
+  ↓
+User B`,
+
+      security: [
+        "User authentication is required for the application.",
+        "JWT is used as part of the authentication system.",
+      ],
+
+      problems: [
+        "Real-time messaging requires maintaining WebSocket connections.",
+        "Media handling requires separate upload and file-serving logic.",
+        "WebSocket communication needed to be handled separately from normal HTTP requests.",
+      ],
+
+      future: [
+        "Message delivery indicators",
+        "Improved media handling",
+        "Message reactions",
+        "Group conversations",
+      ],
+    },
+
+    {
+      id: 4,
+      title: "Student Management System",
+      tech: "Flask • MySQL • REST API",
+
+      description:
+        "A web-based student management system for adding, updating, deleting and searching student records through REST APIs and a MySQL database.",
+
+      features: [
+        "Add student records",
+        "Update student records",
+        "Delete student records",
+        "Search student records",
+        "REST API",
+        "MySQL database",
+        "CRUD operations",
+      ],
+
+      architecture: `Client
+  ↓
+Flask REST API
+  ↓
+CRUD Logic
+  ↓
+MySQL Database`,
+
+      structure: `Application
+├── Flask REST API
+├── Student CRUD Logic
+└── Database Connection
+
+Database
+└── MySQL`,
+
+      flowTitle: "CRUD Flow",
+
+      flow: `Client Request
+     ↓
+Flask REST API
+     ↓
+Validate Request
+     ↓
+CRUD Operation
+     ↓
+MySQL
+     ↓
+JSON Response`,
+
+      problems: [
+        "Student records require consistent CRUD operations.",
+        "REST endpoints were used to separate client requests from database operations.",
+      ],
+
+      future: [
+        "Authentication",
+        "Pagination",
+        "Student profiles",
+        "Improved frontend dashboard",
+      ],
+    },
+
+    {
+      id: 5,
+      title: "Tic-Tac-Toe AI",
+      tech: "Python • Minimax • FastAPI • React",
+
+      description:
+        "An AI-based Tic-Tac-Toe game where the computer evaluates possible game states using the Minimax algorithm.",
+
+      features: [
+        "Single-player AI mode",
+        "Game state management",
+        "Minimax algorithm",
+        "Optimal move selection",
+        "Game result detection",
+      ],
+
+      architecture: `React Game Interface
+      ↓
+FastAPI Backend
+      ↓
+Game Logic
+      ↓
+Minimax Algorithm
+      ↓
+Best Move`,
+
+      structure: `Game
+├── Board State
+├── Player Move
+├── Move Generation
+├── Minimax Algorithm
+└── Winner Detection`,
+
+      flowTitle: "AI Decision Flow",
+
+      flow: `Current Board
+      ↓
+Generate Possible Moves
+      ↓
+Simulate Game States
+      ↓
+Minimax Evaluation
+      ↓
+Compare Scores
+      ↓
+Select Best Move
+      ↓
+Computer Move`,
+
+      problems: [
+        "The AI needs to evaluate possible future game states before selecting a move.",
+        "Minimax recursively evaluates available moves to determine the best decision.",
+      ],
+
+      future: [
+        "Difficulty levels",
+        "Improved game interface",
+        "Two-player mode",
+        "Game statistics",
+      ],
+    },
+
+    {
+      id: 6,
+      title: "Banking Management System",
+      tech: "Python • MySQL",
+
+      description:
+        "A banking management application focused on user registration, login, account management and common banking operations with validation.",
+
+      features: [
+        "User registration",
+        "User login",
+        "Account management",
+        "Deposit",
+        "Withdrawal",
+        "Balance inquiry",
+        "Transaction handling",
+        "Input validation",
+      ],
+
+      architecture: `User
+  ↓
+Python Application
+  ↓
+Banking Logic
+  ↓
+MySQL Database`,
+
+      structure: `Application
+├── User Management
+├── Authentication
+├── Account Management
+├── Transactions
+└── Database Operations
+
+Database
+└── MySQL`,
+
+      flowTitle: "Transaction Flow",
+
+      flow: `User Request
+     ↓
+Validate Input
+     ↓
+Banking Operation
+     ↓
+Update Account Data
+     ↓
+MySQL
+     ↓
+Return Result`,
+
+      problems: [
+        "Banking operations require validation before modifying account data.",
+        "Account-related operations need consistent database updates.",
+      ],
+
+      future: [
+        "Transaction history",
+        "Improved authentication",
+        "Role-based access",
+        "Web-based interface",
+      ],
+    },
+  ];
+
+  // =====================================================
+  // HOME PAGE
+  // =====================================================
+
+  return (
+    <div className="portfolio-shell">
+      {/* =========================
+          NAVBAR
+      ========================= */}
+
+      <nav>
+        <h2>Sunny Singh</h2>
+
+        <div>
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+
+          <button onClick={handleLogout}>Logout</button>
         </div>
-      ) : (
-        <>
-          {/* Login / Register buttons */}
-          <button onClick={() => setShowLogin(true)}>Login</button>
+      </nav>
 
-          <button onClick={() => setShowLogin(false)}>Register</button>
+      {/* =========================
+          HERO SECTION
+      ========================= */}
 
-          {/* Login Form */}
-          {showLogin && (
-            <div>
-              <h2>Login</h2>
+      <section id="home">
+        <div className="hero-visuals" aria-hidden="true">
+          <span className="hero-visual hero-visual--one" />
+          <span className="hero-visual hero-visual--two" />
+          <span className="hero-visual hero-visual--three" />
+        </div>
 
-              <form onSubmit={handleLogin}>
-                <div>
-                  <label>Email</label>
+        <div className="hero-content">
+          <p className="hero-kicker">// Building thoughtful digital systems</p>
+          <h1>Hi, I'm Sunny Singh</h1>
 
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    value={loginData.email}
-                    onChange={handleLoginChange}
-                  />
-                </div>
+          <h2>
+            <span>Full Stack Developer</span>
+          </h2>
 
-                <div>
-                  <label>Password</label>
+          <p>
+            I build practical applications using Python, FastAPI, React and
+            MySQL.
+          </p>
 
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    value={loginData.password}
-                    onChange={handleLoginChange}
-                  />
-                </div>
+          <p>
+            Interested in backend development, full-stack applications and AI
+            automation.
+          </p>
+        </div>
+      </section>
 
-                <button type="submit">Login</button>
-              </form>
+      {/* =========================
+          ABOUT SECTION
+      ========================= */}
+
+      <section id="about">
+        <h2 data-reveal>About Me</h2>
+
+        <div className="about-copy" data-reveal>
+          <p>
+            I am a BSc IT student and a Python-focused Full Stack Developer
+            interested in building practical, secure and real-world
+            applications.
+          </p>
+
+          <p>
+            My main focus is backend development with Python and FastAPI. I work
+            with REST APIs, SQLAlchemy and MySQL, and I use React to build and
+            connect the frontend with my backend services.
+          </p>
+
+          <p>
+            I have built projects involving authentication, email OTP
+            verification, password hashing, JWT-based authentication, WebSocket
+            communication and database operations.
+          </p>
+
+          <p>
+            I learn by building projects rather than only studying theory. My
+            goal is to strengthen my backend and full-stack development skills
+            while understanding how every part of an application works and
+            connects together.
+          </p>
+
+          <h3>What I Work With</h3>
+
+          <p className="tech-list">
+            Python | FastAPI | React | MySQL | SQLAlchemy | REST API | JWT |
+            WebSocket | Authentication | Git | GitHub
+          </p>
+
+          <h3>Development Focus</h3>
+
+          <p>
+            Python Backend Development | Full Stack Development | Secure
+            Authentication | API Development | Real-Time Applications
+          </p>
+        </div>
+      </section>
+
+      {/* =========================
+          PROJECTS SECTION
+      ========================= */}
+
+      <section id="projects">
+        <h2 data-reveal>My Projects</h2>
+
+        <p data-reveal>Click on a project to explore its details.</p>
+
+        <div>
+          {projects.map((project) => (
+            <div key={project.id} className="project-card" data-reveal>
+              <h3>{project.title}</h3>
+
+              <p>{project.tech}</p>
+
+              <p>{project.description}</p>
+
+              <button onClick={() => setSelectedProject(project)}>
+                View Project
+              </button>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* =========================
+          PROJECT DETAIL
+      ========================= */}
+
+      {selectedProject && (
+        <section className="project-detail" data-reveal>
+          <h2>{selectedProject.title}</h2>
+
+          <h3>Technology</h3>
+          <p>{selectedProject.tech}</p>
+
+          <h3>Overview</h3>
+          <p>{selectedProject.description}</p>
+
+          <h3>What I Built</h3>
+
+          <div>
+            {selectedProject.features.map((feature, index) => (
+              <p key={index}>• {feature}</p>
+            ))}
+          </div>
+
+          <h3>Architecture</h3>
+
+          <pre>{selectedProject.architecture}</pre>
+
+          {selectedProject.structure && (
+            <>
+              <h3>Project Structure</h3>
+
+              <pre>{selectedProject.structure}</pre>
+            </>
           )}
 
-          {/* Registration Form */}
-          {!showLogin && (
-            <div>
-              <h2>Create Account</h2>
+          {selectedProject.flow && (
+            <>
+              <h3>{selectedProject.flowTitle}</h3>
 
-              <form onSubmit={handleRegister}>
-                <div>
-                  <label>Name</label>
-
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Enter your name"
-                    value={formData.name}
-                    onChange={handleRegisterChange}
-                  />
-                </div>
-
-                <div>
-                  <label>Email</label>
-
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={handleRegisterChange}
-                  />
-                </div>
-
-                <div>
-                  <label>Password</label>
-
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleRegisterChange}
-                  />
-                </div>
-
-                <button type="submit">Register</button>
-              </form>
-            </div>
+              <pre>{selectedProject.flow}</pre>
+            </>
           )}
-        </>
+
+          {selectedProject.security && (
+            <>
+              <h3>Security</h3>
+
+              <div>
+                {selectedProject.security.map((item, index) => (
+                  <p key={index}>• {item}</p>
+                ))}
+              </div>
+            </>
+          )}
+
+          {selectedProject.apis && (
+            <>
+              <h3>API Endpoints</h3>
+
+              <div>
+                {selectedProject.apis.map((api, index) => (
+                  <p key={index}>• {api}</p>
+                ))}
+              </div>
+            </>
+          )}
+
+          <h3>Problems & Solutions</h3>
+
+          <div>
+            {selectedProject.problems.map((problem, index) => (
+              <p key={index}>• {problem}</p>
+            ))}
+          </div>
+
+          <h3>Future Improvements</h3>
+
+          <div>
+            {selectedProject.future.map((item, index) => (
+              <p key={index}>• {item}</p>
+            ))}
+          </div>
+
+          <button onClick={() => setSelectedProject(null)}>
+            Back to Projects
+          </button>
+        </section>
       )}
+      {/* =========================
+          CONTACT SECTION
+      ========================= */}
+
+      <section id="contact">
+        <h2 data-reveal>Contact Me</h2>
+
+        <p data-reveal>
+          Feel free to connect with me for opportunities, projects, or
+          collaboration.
+        </p>
+
+        <div className="contact-details" data-reveal>
+          <p>
+            <strong>Email:</strong>{" "}
+            <a href="mailto:sunnysinghforeverat@gmail.com">
+              sunnysinghforeverat@gmail.com
+            </a>
+          </p>
+
+          <p>
+            <strong>Phone:</strong> <a href="tel:7350288505">+91 7350288505</a>
+          </p>
+
+          <p>
+            <strong>Location:</strong> Mumbai, Maharashtra
+          </p>
+
+          <p>
+            <strong>GitHub:</strong>{" "}
+            <a
+              href="https://github.com/RajputSunny1924"
+              target="_blank"
+              rel="noopener noreferrer">
+              github.com/RajputSunny1924
+            </a>
+          </p>
+
+          <p>
+            <strong>LinkedIn:</strong>{" "}
+            <a
+              href="https://www.linkedin.com/in/sunny-singh-rajput-677471417"
+              target="_blank"
+              rel="noopener noreferrer">
+              LinkedIn Profile
+            </a>
+          </p>
+        </div>
+
+        <a
+          className="resume-link"
+          href="/sunny-resume.pdf"
+          download
+          data-reveal>
+          Download Resume
+        </a>
+      </section>
+
+      {/* =========================
+          FOOTER
+      ========================= */}
+
+      <footer>
+        <p>© 2026 Sunny Singh. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

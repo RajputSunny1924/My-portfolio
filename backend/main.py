@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException,Response,Cookie
 from sqlalchemy.orm import Session
 from schemas import (UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail)
 from database import Base, engine, get_db
@@ -50,13 +50,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # -------------------------
 # JWT setup
 # -------------------------
-
-security = HTTPBearer()
-
 SECRET_KEY = "my-super-secret-key-for-portfolio"
 ALGORITHM = "HS256"
 
@@ -66,7 +62,32 @@ ALGORITHM = "HS256"
 
 Password_hash = PasswordHash.recommended()
 
+# -------------------------
+# verify token
+# -------------------------
+def verify_token(
+    access_token: str | None = Cookie(default=None)
+):
+    if not access_token:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authenticated"
+        )
 
+    try:
+        payload = jwt.decode(
+            access_token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        return payload
+
+    except JWTError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
 # -------------------------
 # Create JWT token
 # -------------------------
@@ -88,15 +109,23 @@ def create_access_token(user_id: int, email: str):
 # -------------------------
 
 def verify_token(
-    credentials: HTTPAuthorizationCredentials = Depends(security)):
-    token = credentials.credentials
+    access_token: str | None = Cookie(default=None)
+):
+    if not access_token:
+        raise HTTPException(
+            status_code=401,
+            detail="Not authenticated"
+        )
+
     try:
         payload = jwt.decode(
-            token,
+            access_token,
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
+
         return payload
+
     except JWTError:
         raise HTTPException(
             status_code=401,
@@ -217,6 +246,7 @@ def register(
 @app.post("/login", response_model=LoginResponse)
 def login(
     user: UserLogin,
+    response:Response,
     db: Session = Depends(get_db)
 ):
 
@@ -254,15 +284,15 @@ def login(
         user_id=existing_user.id,
         email=existing_user.email
     )
-
-    # IMPORTANT:
-    # Return token to React.
-    # React will store it in localStorage.
-
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,
+        samesite="lax"
+    )
     return {
-        "message": "Login successful",
-        "access_token": token,
-        "token_type": "bearer"
+        "message": "Login successful"
     }
 # -------------------------
 # Verify Email
