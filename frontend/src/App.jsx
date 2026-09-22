@@ -8,6 +8,7 @@ function App() {
   const [showLogin, setShowLogin] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [loginError, setLoginError] = useState("");
 
   // -------------------------
   // Registration data
@@ -95,15 +96,29 @@ function App() {
     return () => observer.disconnect();
   }, [isLoggedIn]);
 
+  const getCsrfToken = () => {
+    const cookies = document.cookie.split("; ");
+
+    const csrfCookie = cookies.find((cookie) =>
+      cookie.startsWith("csrf_token="),
+    );
+
+    return csrfCookie ? csrfCookie.split("=")[1] : null;
+  };
   // -------------------------
   // Logout
   // -------------------------
 
   const handleLogout = async () => {
     try {
+      const csrfToken = getCsrfToken();
+
       await fetch("http://localhost:8000/logout", {
         method: "POST",
         credentials: "include",
+        headers: {
+          "X-CSRF-Token": csrfToken,
+        },
       });
 
       setIsLoggedIn(false);
@@ -241,7 +256,7 @@ function App() {
           password: "",
         });
       } else {
-        console.error("Login failed:", data.detail);
+        setLoginError(data.detail || "Login failed");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -324,7 +339,9 @@ function App() {
                 placeholder="Email"
                 value={loginData.email}
                 onChange={handleLoginChange}
+                autoComplete="new-password"
               />
+              {loginError && <p style={{ color: "red" }}>{loginError}</p>}
 
               <input
                 type="password"
@@ -332,6 +349,7 @@ function App() {
                 placeholder="Password"
                 value={loginData.password}
                 onChange={handleLoginChange}
+                autoComplete="current-password"
               />
 
               <button type="submit">Login</button>
@@ -392,7 +410,7 @@ function App() {
 
   const projects = [
     {
-      id: 1,
+      id: 0,
       title: "Full Stack Authentication Project",
       tech: "React • FastAPI • MySQL • SQLAlchemy • JWT",
 
@@ -470,7 +488,7 @@ Protected API`,
 
       problems: [
         "Frontend and backend initially used different hostnames for cookie communication.",
-        "Using localhost consistently fixed the cookie issue.",
+        "Using 192.168.0.103 consistently fixed the cookie issue.",
         "Authentication state is checked when the React application starts.",
       ],
 
@@ -824,7 +842,7 @@ Return Result`,
       ========================= */}
 
       <nav>
-        <h2>Sunny Singh</h2>
+        <h2>My Portfolio</h2>
 
         <div>
           <a href="#home">Home</a>
@@ -870,9 +888,12 @@ Return Result`,
       {/* =========================
           ABOUT SECTION
       ========================= */}
-
       <section id="about">
         <h2 data-reveal>About Me</h2>
+
+        <div className="about-image" data-reveal>
+          <img src="/about-hero.png" alt="Software development workspace" />
+        </div>
 
         <div className="about-copy" data-reveal>
           <p>
@@ -913,9 +934,44 @@ Return Result`,
             Python Backend Development | Full Stack Development | Secure
             Authentication | API Development | Real-Time Applications
           </p>
+
+          {/* 👇 CARDS YAHAN HONE CHAHIYE */}
+
+          <div className="about-strengths">
+            <div className="strength-card">
+              <div className="strength-icon">&lt;/&gt;</div>
+              <div>
+                <h4>Problem Solver</h4>
+                <p>Finds better ways</p>
+              </div>
+            </div>
+
+            <div className="strength-card">
+              <div className="strength-icon">🧠</div>
+              <div>
+                <h4>Quick Learner</h4>
+                <p>Adapts fast</p>
+              </div>
+            </div>
+
+            <div className="strength-card">
+              <div className="strength-icon">👥</div>
+              <div>
+                <h4>Team Player</h4>
+                <p>Builds together</p>
+              </div>
+            </div>
+
+            <div className="strength-card">
+              <div className="strength-icon">🎯</div>
+              <div>
+                <h4>Goal Oriented</h4>
+                <p>Always forward</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-
       {/* =========================
           PROJECTS SECTION
       ========================= */}
@@ -934,7 +990,17 @@ Return Result`,
 
               <p>{project.description}</p>
 
-              <button onClick={() => setSelectedProject(project)}>
+              <button
+                onClick={() => {
+                  setSelectedProject(project);
+
+                  setTimeout(() => {
+                    document.getElementById("project-details")?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }, 100);
+                }}>
                 View Project
               </button>
             </div>
@@ -947,7 +1013,7 @@ Return Result`,
       ========================= */}
 
       {selectedProject && (
-        <section className="project-detail" data-reveal>
+        <section id="project-details" className="project-detail" data-reveal>
           <h2>{selectedProject.title}</h2>
 
           <h3>Technology</h3>
@@ -1024,7 +1090,13 @@ Return Result`,
             ))}
           </div>
 
-          <button onClick={() => setSelectedProject(null)}>
+          <button
+            onClick={() => {
+              document.getElementById("projects")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }}>
             Back to Projects
           </button>
         </section>

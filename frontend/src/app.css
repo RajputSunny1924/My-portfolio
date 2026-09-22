@@ -65,15 +65,23 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-
   background:
     linear-gradient(
+      81deg,
+      #060b14 0%,
+      rgb(0 0 0 / 94%) 38%,
+      rgb(3 9 20 / 0%) 68%,
+      rgba(7, 26, 61, 0.3) 100%
+    ),
+    linear-gradient(99deg, rgb(0 0 0 / 34%), #00000000 55%),
+    /* background:
+    linear-gradient(
       90deg,
-      rgba(3, 9, 20, 0.94) 0%,
+      rgba(0, 4, 10, 0.94) 0%,
       rgba(3, 9, 20, 0.8) 38%,
       rgba(3, 9, 20, 0.52) 68%,
-      rgba(3, 9, 20, 0.3) 100%
-    ),
+      rgba(7, 26, 61, 0.3) 100%
+    ), */
     linear-gradient(0deg, rgba(3, 9, 20, 0.38), transparent 55%),
     url("/hero-developer.png");
 
@@ -155,8 +163,11 @@ nav::after {
 
 nav h2 {
   margin: 0;
-  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
-  letter-spacing: -0.04em;
+  letter-spacing: 0.1rem;
+  font-weight: 1000;
+  font-size: 1.5rem;
+
+  word-spacing: 5px;
 
   transition:
     transform var(--motion) ease,
@@ -169,7 +180,6 @@ nav h2:hover {
 }
 
 nav h2::before {
-  content: "</>";
   margin-right: 0.6rem;
   color: var(--accent);
 
@@ -414,39 +424,173 @@ section {
    ========================================================= */
 #about {
   display: grid;
-  grid-template-columns: minmax(180px, 0.65fr) minmax(0, 1.35fr);
-  column-gap: 6rem;
+
+  grid-template-columns: minmax(360px, 0.9fr) minmax(0, 1.1fr);
+  grid-template-rows: auto 1fr;
+
+  column-gap: 5rem;
 
   border-top: 1px solid var(--border);
+
+  position: relative;
+  overflow: hidden;
+
+  align-items: start;
 }
 
+/* About heading - RIGHT SIDE */
 #about h2 {
-  grid-row: span 6;
+  grid-column: 2;
+  grid-row: 1;
+
+  margin: 0 0 1.5rem;
+
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  line-height: 1;
 }
 
-#about h3 {
-  margin: 2.2rem 0 0.5rem;
+/* Image - LEFT SIDE */
+.about-image {
+  grid-column: 1;
+  grid-row: 1 / span 2;
 
-  color: #5ebcff;
-  font-size: 0.74rem;
-  font-family: "DM Mono", monospace;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  width: 100%;
+  height: 620px;
+
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding-top: 0;
+}
+
+.about-image::before {
+  content: "";
+
+  position: absolute;
+
+  width: 80%;
+  height: 80%;
+
+  background: rgba(0, 150, 255, 0.16);
+
+  filter: blur(70px);
+
+  border-radius: 50%;
+
+  z-index: 0;
+}
+
+.about-image img {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  height: 620px;
+
+  max-width: 540px;
+
+  object-fit: cover;
+
+  display: block;
+
+  border-radius: 24px;
+
+  border: 1px solid rgba(50, 180, 255, 0.6);
+
+  box-shadow:
+    0 0 30px rgba(0, 140, 255, 0.2),
+    0 25px 70px rgba(0, 0, 0, 0.45);
+}
+.about-copy {
+  grid-column: 2;
+  grid-row: 2;
+
+  max-width: 720px;
+}
+#about p {
+  margin: 0 0 1.2rem;
+  line-height: 1.75;
+}
+.about-strengths {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 1rem;
+
+  margin-top: 2rem;
+}
+
+.strength-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.8rem;
+
+  padding: 1rem;
+
+  min-height: 78px;
+
+  border: 1px solid rgba(70, 150, 220, 0.25);
+
+  border-radius: 14px;
+
+  background: rgba(5, 15, 30, 0.55);
+
+  backdrop-filter: blur(10px);
 
   transition:
-    color var(--motion) ease,
-    transform var(--motion) ease;
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
 }
 
-#about h3:hover {
-  color: #fff;
-  transform: translateX(4px);
+.strength-card:hover {
+  transform: translateY(-5px);
+
+  border-color: rgba(50, 180, 255, 0.65);
+
+  background: rgba(10, 30, 55, 0.75);
 }
 
-#about p {
-  margin: 0 0 1rem;
+.strength-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(0, 130, 255, 0.12);
+
+  border: 1px solid rgba(0, 150, 255, 0.25);
+
+  font-size: 1.1rem;
 }
 
+.strength-card h4 {
+  margin: 0;
+
+  font-size: 0.85rem;
+}
+
+.strength-card p {
+  margin: 0 !important;
+
+  font-size: 0.7rem;
+
+  opacity: 0.65;
+
+  line-height: 1.3 !important;
+}
 /* =========================================================
    09. PROJECTS
    ========================================================= */
@@ -951,12 +1095,4 @@ body:has(form) #root > div > div > button:hover {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* Keep portfolio sections transparent over the fixed background. */
-#home,
-#about,
-#projects,
-#contact {
-  background: transparent;
 }

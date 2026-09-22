@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException,Response,Cookie
+from fastapi import FastAPI, Depends, HTTPException,Response,Cookie,Header, Request
 from sqlalchemy.orm import Session
 from schemas import (UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail)
 from database import Base, engine, get_db
@@ -6,19 +6,15 @@ from models import User
 from pwdlib import PasswordHash
 from jose import jwt, JWTError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import secrets
 import smtplib
-import os
+import os,time
 from pathlib import Path
 from email.message import EmailMessage
 
-# -------------------------
 # Environment variables
-# -------------------------
-
 BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
 
@@ -26,23 +22,19 @@ load_dotenv(ENV_FILE)
 
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+SECRET_KEY = os.getenv("EMAIL_PASSWORD")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY is not configured")
 
-# -------------------------
-# Database
-# -------------------------
+ALGORITHM = "HS256"
+
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 Base.metadata.create_all(bind=engine)
 
-# -------------------------
-# FastAPI
-# -------------------------
-
 app = FastAPI()
 
-# -------------------------
 # CORS
-# -------------------------
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -50,21 +42,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# -------------------------
-# JWT setup
-# -------------------------
-SECRET_KEY = "my-super-secret-key-for-portfolio"
-ALGORITHM = "HS256"
-
-# -------------------------
-# Password hashing
-# -------------------------
 
 Password_hash = PasswordHash.recommended()
 
-# -------------------------
 # verify token
-# -------------------------
 def verify_token(
     access_token: str | None = Cookie(default=None)
 ):
@@ -88,14 +69,17 @@ def verify_token(
             status_code=401,
             detail="Invalid token"
         )
-# -------------------------
+    
 # Create JWT token
-# -------------------------
-
 def create_access_token(user_id: int, email: str):
+    expire = datetime.utcnow() + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
     payload = {
         "user_id": user_id,
-        "email": email
+        "email": email,
+        "exp": expire
+
     }
     token = jwt.encode(
         payload,
@@ -103,46 +87,19 @@ def create_access_token(user_id: int, email: str):
         algorithm=ALGORITHM
     )
     return token
-
-# -------------------------
-# Verify JWT token
-# -------------------------
-
-def verify_token(
-    access_token: str | None = Cookie(default=None)
-):
-    if not access_token:
-        raise HTTPException(
-            status_code=401,
-            detail="Not authenticated"
-        )
-
-    try:
-        payload = jwt.decode(
-            access_token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-
-        return payload
-
-    except JWTError:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token"
-        )
-# -------------------------
+    
 # Generate OTP
-# -------------------------
-
 def generate_otp():
     return str(
         secrets.randbelow(900000) + 100000
     )
-# -------------------------
-# Send OTP email
-# -------------------------
 
+# Generate CSRF Token
+def generate_csrf_token():
+    return secrets.token_urlsafe(32)
+
+
+# Send OTP email
 def send_otp_email(
     receiver_email: str,
     otp: str
@@ -165,15 +122,13 @@ def send_otp_email(
             EMAIL_PASSWORD
         )
         server.send_message(message)
-# -------------------------
+
 # Home
-# -------------------------
 @app.get("/")
 def home():
     return {"message": "backend is connected succesfuly 😎"}
-# -------------------------
+
 # Protected Profile
-# -------------------------
 @app.get("/profile")
 def profile(
     payload: dict = Depends(verify_token)):
@@ -183,10 +138,7 @@ def profile(
         "email": payload["email"]
     }
 
-# -------------------------
 # Register
-# -------------------------
-
 @app.post(
     "/register",
     response_model=RegisterResponse
@@ -239,22 +191,46 @@ def register(
         "message": "user registration succesful",
         "user_id": new_user.id
     }
-# -------------------------
-# Login
-# -------------------------
+login_attempts = {}
 
+MAX_LOGIN_ATTEMPTS = 5
+BLOCK_TIME = 60
+
+# Login
 @app.post("/login", response_model=LoginResponse)
 def login(
     user: UserLogin,
     response:Response,
-    db: Session = Depends(get_db)
+    request:Request,
+    db: Session = Depends(get_db),
 ):
+    client_ip = request.client.host
+
+    current_time = time.time()
+    if client_ip in login_attempts:
+        attempt, blocked_until = login_attempts[client_ip]
+        if current_time < blocked_until:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many login attempts. Please try again later."
+            )
+    
 
     existing_user = db.query(User).filter(
         User.email == user.email
     ).first()
     # User not found
     if not existing_user:
+        attempts, _ = login_attempts.get(client_ip, (0, 0))
+        attempts += 1
+
+        if attempts >= MAX_LOGIN_ATTEMPTS:
+            login_attempts[client_ip] = (
+                attempts,
+                time.time() + BLOCK_TIME
+            )
+        else:
+            login_attempts[client_ip] = (attempts, 0)
 
         raise HTTPException(
             status_code=401,
@@ -267,11 +243,22 @@ def login(
     )
 
     if not password_correct:
-
+        attempts, _ = login_attempts.get(client_ip, (0, 0))
+        attempts += 1
+    
+        if attempts >= MAX_LOGIN_ATTEMPTS:
+            login_attempts[client_ip] = (
+                attempts,
+                time.time() + BLOCK_TIME
+            )
+        else:
+            login_attempts[client_ip] = (attempts, 0)
+    
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password"
         )
+    login_attempts.pop(client_ip, None)
     # Check email verification
     if not existing_user.is_verified:
 
@@ -289,15 +276,61 @@ def login(
         value=token,
         httponly=True,
         secure=False,
-        samesite="lax"
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        path="/"
+    )
+
+    # create CSRF
+    csrf_token = generate_csrf_token()
+
+    response.set_cookie(
+        key="csrf_token",
+        value=csrf_token,
+        httponly=False,
+        secure=False,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        path="/"
     )
     return {
         "message": "Login successful"
     }
-# -------------------------
-# Verify Email
-# -------------------------
+def verify_csrf_token(
+    csrf_token: str | None = Cookie(default=None),
+    x_csrf_token: str | None = Header(default=None),
+):
+    if not csrf_token or not x_csrf_token:
+        raise HTTPException(
+            status_code=403,
+            detail="CSRF token missing"
+        )
 
+    if not secrets.compare_digest(csrf_token, x_csrf_token):
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid CSRF token"
+        )
+
+# Logout
+@app.post("/logout")
+def logout(response: Response,
+    _: None = Depends(verify_csrf_token)
+):
+    response.delete_cookie(
+        key="access_token",
+        path="/"
+    )
+    response.delete_cookie(
+        key="csrf_token",
+        path="/"
+    )
+
+    return {
+        "message": "Logout successful"
+    }
+
+# Verify Email
 @app.post("/verify-email")
 def verify_email(
     data: VerifyEmail,
@@ -326,6 +359,8 @@ def verify_email(
             status_code=400,
             detail="OTP expired"
         )
+
+
 
     # Verify OTP
     otp_correct = Password_hash.verify(

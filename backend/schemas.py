@@ -1,13 +1,18 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field,EmailStr
 
 class UserCreate(BaseModel):
-    name:str
+    name:str = Field(min_length=2, max_length=50)
     email:str
-    password:str
+    password: str = Field(min_length=8, max_length=50)
 
 class UserLogin(BaseModel):
-    email:str
-    password:str
+    email: EmailStr
+    password: str = Field(max_length=128)
+
+
+class VerifyEmail(BaseModel):
+    email: EmailStr
+    otp: str = Field(pattern=r"^\d{6}$")
 
 class RegisterResponse(BaseModel):
     message:str
@@ -16,6 +21,3 @@ class RegisterResponse(BaseModel):
 class LoginResponse(BaseModel):
     message: str
 
-class VerifyEmail(BaseModel):
-    email: str
-    otp: str
