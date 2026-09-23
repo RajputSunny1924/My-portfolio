@@ -1,7 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker,declarative_base
+from dotenv import load_dotenv
+import os
 
-DATABASE_URL = "mysql+pymysql://root:anushka1924@localhost:3306/portfolio_db"
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not configured")
 
 engine = create_engine(DATABASE_URL)
 

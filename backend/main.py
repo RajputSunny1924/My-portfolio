@@ -6,6 +6,7 @@ from models import User
 from pwdlib import PasswordHash
 from jose import jwt, JWTError
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import secrets
@@ -33,6 +34,19 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS
 app.add_middleware(
@@ -116,7 +130,6 @@ def send_otp_email(
         "smtp.gmail.com",
         465
     ) as server:
-        print("OTP:", otp)
         server.login(
             EMAIL_ADDRESS,
             EMAIL_PASSWORD
@@ -177,7 +190,8 @@ def register(
         password=hashed_password,
         is_verified=False,
         verification_otp=hashed_otp,
-        otp_expiry=otp_expiry
+        otp_expiry=otp_expiry,
+        otp_attempts=0
     )
     db.add(new_user)
     db.commit()
@@ -340,7 +354,6 @@ def verify_email(
     ).first()
 
     if not existing_user:
-
         raise HTTPException(
             status_code=404,
             detail="User not found"
@@ -352,32 +365,45 @@ def verify_email(
             status_code=400,
             detail="Email already verified"
         )
-
+    # check otp exists
+    if not existing_user.verification_otp or not existing_user.otp_expiry:
+        raise HTTPException(
+            status_code=400,
+            detail="OTP is not available"
+        )
+    # check otp expiry
     if datetime.now() > existing_user.otp_expiry:
-
         raise HTTPException(
             status_code=400,
             detail="OTP expired"
         )
-
-
-
+    # Maximum 5 wrong attempts
+    if existing_user.otp_attempts >= 5:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many OTP attempts"
+        )
     # Verify OTP
     otp_correct = Password_hash.verify(
         data.otp,
         existing_user.verification_otp
     )
     if not otp_correct:
-
+        existing_user.otp_attempts +=1
+        db.commit()
+        if existing_user.otp_attempts >= 5:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many OTP attempts"
+            )
         raise HTTPException(
             status_code=400,
             detail="Invalid OTP"
         )
-    # Mark email as verified
     existing_user.is_verified = True
-    # Remove OTP after successful verification
     existing_user.verification_otp = None
     existing_user.otp_expiry = None
+    existing_user.otp_attempts = 0
 
     db.commit()
 
