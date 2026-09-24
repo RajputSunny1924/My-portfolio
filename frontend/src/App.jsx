@@ -57,6 +57,7 @@ function App() {
           "https://portfolio-backend-2swx.onrender.com/profile",
           {
             method: "GET",
+            credentials: "include",
           },
         );
 
