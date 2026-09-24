@@ -53,9 +53,12 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch("http://localhost:8000/profile", {
-          credentials: "include",
-        });
+        const response = await fetch(
+          "https://portfolio-backend-2swx.onrender.com/profile",
+          {
+            credentials: "include",
+          },
+        );
 
         if (response.ok) {
           setIsLoggedIn(true);
@@ -113,7 +116,7 @@ function App() {
     try {
       const csrfToken = getCsrfToken();
 
-      await fetch("http://localhost:8000/logout", {
+      await fetch("https://portfolio-backend-2swx.onrender.com/logout", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -158,13 +161,16 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://portfolio-backend-2swx.onrender.com/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       const data = await response.json();
 
@@ -199,13 +205,16 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/verify-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://portfolio-backend-2swx.onrender.com/verify-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(verificationData),
         },
-        body: JSON.stringify(verificationData),
-      });
+      );
 
       const data = await response.json();
 
@@ -235,14 +244,17 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://portfolio-backend-2swx.onrender.com/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(loginData),
         },
-        credentials: "include",
-        body: JSON.stringify(loginData),
-      });
+      );
 
       const data = await response.json();
 

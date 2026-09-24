@@ -52,7 +52,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["https://my-portfolio-h5de.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
