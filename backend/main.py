@@ -165,21 +165,60 @@ def profile(
 )
 def register(
     user: UserCreate,
-    db: Session = Depends(get_db)):
+    db: Session = Depends(get_db)
+):
     existing_user = db.query(User).filter(
         User.email == user.email
     ).first()
+
+    # -------------------------
+    # Existing user
+    # -------------------------
     if existing_user:
 
-        raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
+        # Already verified
+        if existing_user.is_verified:
+            raise HTTPException(
+                status_code=400,
+                detail="Email already registered"
+            )
+
+        # Existing user is NOT verified
+        # Generate a new OTP
+        otp = generate_otp()
+
+        # Hash OTP
+        hashed_otp = Password_hash.hash(otp)
+
+        # OTP expires after 5 minutes
+        otp_expiry = datetime.now() + timedelta(minutes=5)
+
+        # Update only OTP-related information
+        existing_user.verification_otp = hashed_otp
+        existing_user.otp_expiry = otp_expiry
+        existing_user.otp_attempts = 0
+
+        db.commit()
+
+        # Send new OTP
+        send_otp_email(
+            user.email,
+            otp
         )
-    
+
+        return {
+            "message": "New OTP sent. Please verify your email.",
+            "user_id": existing_user.id
+        }
+
+    # -------------------------
+    # New user
+    # -------------------------
+
     # Generate OTP
     otp = generate_otp()
 
-    # Hash OTP before storing
+    # Hash OTP
     hashed_otp = Password_hash.hash(otp)
 
     # OTP expires after 5 minutes
@@ -200,18 +239,23 @@ def register(
         otp_expiry=otp_expiry,
         otp_attempts=0
     )
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
     # Send OTP
     send_otp_email(
         user.email,
         otp
     )
+
     return {
-        "message": "user registration succesful",
+        "message": "User registration successful",
         "user_id": new_user.id
     }
+
+
 login_attempts = {}
 
 MAX_LOGIN_ATTEMPTS = 5
