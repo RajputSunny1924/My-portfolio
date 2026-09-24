@@ -359,26 +359,19 @@ def login(
     path="/"
 )
     return {
-        "message": "Login successful"
+        "message": "Login successful",
+        "csrf_token": csrf_token
     }
 def verify_csrf_token(
-    csrf_token: str | None = Cookie(default=None),
     x_csrf_token: str | None = Header(default=None),
 ):
-    print("COOKIE CSRF:", csrf_token)
-    print("HEADER CSRF:", x_csrf_token)
-
-    if not csrf_token or not x_csrf_token:
+    if not x_csrf_token:
         raise HTTPException(
             status_code=403,
             detail="CSRF token missing"
         )
 
-    if not secrets.compare_digest(csrf_token, x_csrf_token):
-        raise HTTPException(
-            status_code=403,
-            detail="Invalid CSRF token"
-        )
+    return x_csrf_token
 
 # Logout
 @app.post("/logout")

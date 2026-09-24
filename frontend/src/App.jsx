@@ -9,7 +9,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginError, setLoginError] = useState("");
-
+  const [csrfToken, setCsrfToken] = useState(null);
   // -------------------------
   // Registration data
   // -------------------------
@@ -100,15 +100,6 @@ function App() {
     return () => observer.disconnect();
   }, [isLoggedIn]);
 
-  const getCsrfToken = () => {
-    const cookies = document.cookie.split("; ");
-
-    const csrfCookie = cookies.find((cookie) =>
-      cookie.startsWith("csrf_token="),
-    );
-
-    return csrfCookie ? csrfCookie.split("=")[1] : null;
-  };
   // -------------------------
   // Logout
   // -------------------------
@@ -133,6 +124,7 @@ function App() {
       }
 
       setIsLoggedIn(false);
+      setCsrfToken(null);
       setSelectedProject(null);
     } catch (error) {
       console.error("Logout error:", error);
@@ -271,6 +263,7 @@ function App() {
 
       if (response.ok) {
         setIsLoggedIn(true);
+        setCsrfToken(data.csrf_token);
 
         setLoginData({
           email: "",
