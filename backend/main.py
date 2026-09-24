@@ -340,11 +340,18 @@ def logout(response: Response,
 ):
     response.delete_cookie(
         key="access_token",
-        path="/"
+        path="/",
+        secure=True,
+        httponly=True,
+        samesite="none"
     )
+    
     response.delete_cookie(
         key="csrf_token",
-        path="/"
+        path="/",
+        secure=True,
+        httponly=False,
+        samesite="none"
     )
 
     return {

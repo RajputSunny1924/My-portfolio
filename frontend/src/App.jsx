@@ -112,18 +112,25 @@ function App() {
   // -------------------------
   // Logout
   // -------------------------
-
   const handleLogout = async () => {
     try {
       const csrfToken = getCsrfToken();
 
-      await fetch("https://portfolio-backend-2swx.onrender.com/logout", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "X-CSRF-Token": csrfToken,
+      const response = await fetch(
+        "https://portfolio-backend-2swx.onrender.com/logout",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "X-CSRF-Token": csrfToken,
+          },
         },
-      });
+      );
+
+      if (!response.ok) {
+        console.error("Logout failed:", response.status);
+        return;
+      }
 
       setIsLoggedIn(false);
       setSelectedProject(null);
@@ -131,7 +138,6 @@ function App() {
       console.error("Logout error:", error);
     }
   };
-
   // -------------------------
   // Registration input
   // -------------------------
