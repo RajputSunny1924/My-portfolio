@@ -10,11 +10,11 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import secrets
-import smtplib
 import os,time
+from email.message import EmailMessage
 from pathlib import Path
 from email.message import EmailMessage
-
+import requests
 # Environment variables
 BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
@@ -115,27 +115,34 @@ def generate_csrf_token():
 
 
 # Send OTP email
-def send_otp_email(
-    receiver_email: str,
-    otp: str
-):
-    message = EmailMessage()
-    message["Subject"] = "My Portfolio - Email Verification OTP"
-    message["From"] = EMAIL_ADDRESS
-    message["To"] = receiver_email
-    message.set_content(
-        f"Your email verification OTP is: {otp}\n\n"
-        "This OTP is valid for 5 minutes."
+def send_otp_email(to_email: str, otp: str):
+    resend_api_key = os.getenv("RESEND_API_KEY")
+
+    if not resend_api_key:
+        raise RuntimeError("RESEND_API_KEY is not configured")
+
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={
+            "Authorization": f"Bearer {resend_api_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "from": "onboarding@resend.dev",
+            "to": [to_email],
+            "subject": "Your Email Verification OTP",
+            "html": f"""
+                <h2>Email Verification</h2>
+                <p>Your OTP is:</p>
+                <h1>{otp}</h1>
+                <p>This OTP will expire in 5 minutes.</p>
+            """,
+        },
+        timeout=15,
     )
-    with smtplib.SMTP_SSL(
-        "smtp.gmail.com",
-        465
-    ) as server:
-        server.login(
-            EMAIL_ADDRESS,
-            EMAIL_PASSWORD
-        )
-        server.send_message(message)
+
+    if response.status_code >= 400:
+        raise RuntimeError(f"Resend email failed: {response.text}")
 
 # Home
 @app.get("/")
