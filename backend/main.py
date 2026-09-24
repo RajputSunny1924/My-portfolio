@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException,Response,Cookie,Header, Request
+from fastapi import FastAPI, Depends, HTTPException, Response, Cookie, Header, Request
 from sqlalchemy.orm import Session
-from schemas import (UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail)
+from schemas import UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail
 from database import Base, engine, get_db
 from models import User
 from pwdlib import PasswordHash
@@ -9,11 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-import secrets
-import os,time
-from email.message import EmailMessage
 from pathlib import Path
-from email.message import EmailMessage
+import secrets
+import os
+import time
 import requests
 # Environment variables
 BASE_DIR = Path(__file__).resolve().parent
@@ -297,8 +296,8 @@ def login(
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         path="/"
     )
@@ -310,8 +309,8 @@ def login(
         key="csrf_token",
         value=csrf_token,
         httponly=False,
-        secure=False,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         path="/"
     )

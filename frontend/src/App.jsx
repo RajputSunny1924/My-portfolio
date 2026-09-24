@@ -56,7 +56,7 @@ function App() {
         const response = await fetch(
           "https://portfolio-backend-2swx.onrender.com/profile",
           {
-            credentials: "include",
+            method: "GET",
           },
         );
 
@@ -209,6 +209,7 @@ function App() {
         "https://portfolio-backend-2swx.onrender.com/verify-email",
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -248,10 +249,11 @@ function App() {
         "https://portfolio-backend-2swx.onrender.com/login",
         {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
+
           body: JSON.stringify(loginData),
         },
       );
