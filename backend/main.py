@@ -293,27 +293,27 @@ def login(
         email=existing_user.email
     )
     response.set_cookie(
-        key="access_token",
-        value=token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        path="/"
-    )
+    key="access_token",
+    value=token,
+    httponly=True,
+    secure=True,
+    samesite="none",
+    max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    path="/"
+)
 
     # create CSRF
     csrf_token = generate_csrf_token()
 
     response.set_cookie(
-        key="csrf_token",
-        value=csrf_token,
-        httponly=False,
-        secure=True,
-        samesite="none",
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        path="/"
-    )
+    key="csrf_token",
+    value=csrf_token,
+    httponly=False,
+    secure=True,
+    samesite="none",
+    max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    path="/"
+)
     return {
         "message": "Login successful"
     }
