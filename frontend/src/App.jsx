@@ -453,32 +453,46 @@ function App() {
   const projects = [
     {
       id: 0,
+
       title: "Full Stack Authentication Project",
-      tech: "React • FastAPI • MySQL • SQLAlchemy • JWT",
+
+      tech: "React • FastAPI • MySQL • SQLAlchemy • JWT • Argon2 • Resend API",
 
       description:
-        "A secure full-stack authentication system with user registration, email OTP verification, password hashing, JWT authentication and protected backend APIs.",
+        "A secure full-stack authentication system with user registration, email OTP verification, Argon2 password hashing, JWT-based authentication, HttpOnly cookie authentication, CSRF protection, protected APIs, input validation, login rate limiting, and secure frontend-backend communication.",
 
       features: [
         "User registration and login",
         "Email OTP verification",
+        "Resend OTP functionality",
+        "OTP expiry and attempt tracking",
         "Argon2 password hashing",
         "JWT authentication",
         "HttpOnly cookie-based authentication",
+        "CSRF protection",
         "Protected API endpoints",
+        "Login rate limiting",
+        "Email validation",
+        "Password length validation",
+        "Input validation using Pydantic",
         "React frontend connected with FastAPI",
         "SQLAlchemy database operations",
+        "MySQL database",
+        "Secure CORS configuration",
+        "Secure cookie configuration",
+        "Automatic authentication check on application startup",
+        "Secure logout with cookie removal",
       ],
 
       architecture: `React Frontend
       ↓
 FastAPI API
       ↓
-Authentication Logic
+Authentication & Security Logic
       ↓
-SQLAlchemy
+SQLAlchemy ORM
       ↓
-MySQL`,
+MySQL Database`,
 
       structure: `frontend/
 ├── App.jsx
@@ -495,11 +509,13 @@ backend/
 
       flow: `Register
    ↓
-Generate OTP
+Generate Secure OTP
    ↓
 Hash Password + OTP
    ↓
 Save User
+   ↓
+Send OTP via Resend API
    ↓
 Email Verification
    ↓
@@ -507,39 +523,57 @@ Login
    ↓
 Create JWT
    ↓
-HttpOnly Cookie
+HttpOnly Secure Cookie
+   ↓
+CSRF Protection
    ↓
 Protected API`,
 
       security: [
         "Passwords are stored as Argon2 hashes.",
-        "Email OTP is generated securely and stored as a hash.",
-        "OTP verification uses an expiry time.",
+        "OTP values are securely generated and stored as hashes.",
+        "OTP verification uses a 5-minute expiry time.",
+        "OTP attempts are tracked.",
+        "Users must verify their email before login.",
         "JWT is stored inside an HttpOnly cookie.",
+        "Secure and SameSite cookie settings are used in production.",
         "Protected endpoints verify the authentication cookie.",
-        "CORS is configured for frontend-backend communication.",
+        "CSRF protection is applied to state-changing requests.",
+        "Login attempts are rate-limited to reduce brute-force attempts.",
+        "Email addresses are validated using Pydantic EmailStr.",
+        "Password input has minimum and maximum length validation.",
+        "OTP format is validated.",
+        "CORS is restricted to the deployed frontend.",
+        "Security response headers are configured.",
+        "Authentication state is checked when the React application starts.",
       ],
 
       apis: [
         "POST /register",
         "POST /verify-email",
+        "POST /resend-otp",
         "POST /login",
         "GET /profile",
+        "GET /csrf",
         "POST /logout",
       ],
 
       problems: [
-        "Frontend and backend initially used different hostnames for cookie communication.",
-        "Using 192.168.0.103 consistently fixed the cookie issue.",
-        "Authentication state is checked when the React application starts.",
+        "Frontend and backend initially had cookie communication issues.",
+        "Production required secure cross-origin cookie configuration.",
+        "SMTP email delivery was not suitable for the Render deployment environment.",
+        "Email delivery was moved to the Resend API.",
+        "Unverified users can request a new OTP instead of getting permanently blocked.",
+        "Authentication state is checked automatically when the React application starts.",
+        "CSRF handling was adjusted for the deployed frontend and backend architecture.",
       ],
 
       future: [
-        "CSRF protection",
-        "HTTPS with Secure cookies",
-        "Rate limiting",
-        "Password reset",
+        "Password reset functionality",
         "Role-based authorization",
+        "Refresh token system",
+        "Account lockout improvements",
+        "Production monitoring and logging",
       ],
     },
 
