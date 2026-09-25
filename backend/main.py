@@ -491,3 +491,49 @@ def verify_email(
     return {
         "message": "Email verified successfully"
     }
+@app.post("/resend-otp")
+def resend_otp(
+    data: ResendOTP,
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(
+        User.email == data.email
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    if user.is_verified:
+        raise HTTPException(
+            status_code=400,
+            detail="Email is already verified"
+        )
+
+    # Generate new OTP
+    otp = generate_otp()
+
+    # Hash OTP
+    hashed_otp = Password_hash.hash(otp)
+
+    # New expiry: 5 minutes
+    otp_expiry = datetime.now() + timedelta(minutes=5)
+
+    # Update OTP information
+    user.verification_otp = hashed_otp
+    user.otp_expiry = otp_expiry
+    user.otp_attempts = 0
+
+    db.commit()
+
+    # Send new OTP
+    send_otp_email(
+        user.email,
+        otp
+    )
+
+    return {
+        "message": "New OTP sent successfully"
+    }

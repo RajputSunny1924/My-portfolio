@@ -21,3 +21,5 @@ class RegisterResponse(BaseModel):
 class LoginResponse(BaseModel):
     message: str
 
+class ResendOTP(BaseModel):
+    email: EmailStr

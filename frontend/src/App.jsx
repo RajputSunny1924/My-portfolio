@@ -281,6 +281,22 @@ function App() {
           email: "",
           password: "",
         });
+
+        setLoginError("");
+      } else if (
+        response.status === 403 &&
+        data.detail === "Please verify your email first"
+      ) {
+        // User exists but email is not verified
+        setVerificationData({
+          email: loginData.email,
+          otp: "",
+        });
+
+        setShowVerification(true);
+        setShowLogin(false);
+
+        setLoginError("");
       } else {
         setLoginError(data.detail || "Login failed");
       }
