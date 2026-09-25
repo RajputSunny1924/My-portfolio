@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Response, Cookie, Header, Request
 from sqlalchemy.orm import Session
-from schemas import UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail
+from schemas import UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail, ResendOTP
 from database import Base, engine, get_db
 from models import User
 from pwdlib import PasswordHash
