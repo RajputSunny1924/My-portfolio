@@ -9,7 +9,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginError, setLoginError] = useState("");
-  const [csrfToken, setCsrfToken] = useState(null);
   // -------------------------
   // Registration data
   // -------------------------
@@ -78,8 +77,6 @@ function App() {
     checkAuth();
   }, []);
 
-  // Reveal content only when it enters the viewport. The class-based approach
-  // keeps the animation behaviour separate from the portfolio content.
   useEffect(() => {
     if (!isLoggedIn) return undefined;
 
@@ -105,15 +102,30 @@ function App() {
   // -------------------------
   const handleLogout = async () => {
     try {
-      const csrfToken = getCsrfToken();
+      // Get CSRF token from backend
+      const csrfResponse = await fetch(
+        "https://portfolio-backend-2swx.onrender.com/csrf",
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
 
+      if (!csrfResponse.ok) {
+        console.error("CSRF fetch failed:", csrfResponse.status);
+        return;
+      }
+
+      const csrfData = await csrfResponse.json();
+
+      // Logout request
       const response = await fetch(
         "https://portfolio-backend-2swx.onrender.com/logout",
         {
           method: "POST",
           credentials: "include",
           headers: {
-            "X-CSRF-Token": csrfToken,
+            "X-CSRF-Token": csrfData.csrf_token,
           },
         },
       );
@@ -124,8 +136,9 @@ function App() {
       }
 
       setIsLoggedIn(false);
-      setCsrfToken(null);
       setSelectedProject(null);
+
+      console.log("Logout successful");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -263,7 +276,6 @@ function App() {
 
       if (response.ok) {
         setIsLoggedIn(true);
-        setCsrfToken(data.csrf_token);
 
         setLoginData({
           email: "",
