@@ -304,15 +304,15 @@ function App() {
       console.error("Login error:", error);
     }
   };
-
   // -------------------------
   // Loading screen
   // -------------------------
 
   if (checkingAuth) {
     return (
-      <div>
-        <h2>Checking authentication...</h2>
+      <div className="auth-loader">
+        <div className="loader-spinner"></div>
+        <p>Checking authentication...</p>
       </div>
     );
   }
