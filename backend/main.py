@@ -14,6 +14,9 @@ import secrets
 import os
 import time
 import requests
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 # Environment variables
 BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
@@ -51,7 +54,10 @@ app.add_middleware(SecurityHeadersMiddleware)
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://my-portfolio-h5de.onrender.com"],
+    allow_origins=[
+        "https://my-portfolio-h5de.onrender.com",
+        "http://localhost:6173"
+        ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -115,33 +121,38 @@ def generate_csrf_token():
 
 # Send OTP email
 def send_otp_email(to_email: str, otp: str):
-    resend_api_key = os.getenv("RESEND_API_KEY")
+    sender_email = os.getenv("EMAIL_ADDRESS")
+    app_password = os.getenv("EMAIL_APP_PASSWORD")
 
-    if not resend_api_key:
-        raise RuntimeError("RESEND_API_KEY is not configured")
+    if not sender_email or not app_password:
+        raise RuntimeError("Email configuration is missing")
 
-    response = requests.post(
-        "https://api.resend.com/emails",
-        headers={
-            "Authorization": f"Bearer {resend_api_key}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "from": "onboarding@resend.dev",
-            "to": [to_email],
-            "subject": "Your Email Verification OTP",
-            "html": f"""
-                <h2>Email Verification</h2>
-                <p>Your OTP is:</p>
-                <h1>{otp}</h1>
-                <p>This OTP will expire in 5 minutes.</p>
-            """,
-        },
-        timeout=15,
-    )
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Your Email Verification OTP"
+    message["From"] = sender_email
+    message["To"] = to_email
 
-    if response.status_code >= 400:
-        raise RuntimeError(f"Resend email failed: {response.text}")
+    html = f"""
+    <html>
+        <body>
+            <h2>Email Verification</h2>
+            <p>Your OTP is:</p>
+            <h1>{otp}</h1>
+            <p>This OTP will expire in 5 minutes.</p>
+        </body>
+    </html>
+    """
+
+    message.attach(MIMEText(html, "html"))
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()
+        server.login(sender_email, app_password)
+        server.sendmail(
+            sender_email,
+            to_email,
+            message.as_string()
+        )
 
 # Home
 @app.get("/")
@@ -197,15 +208,18 @@ def register(
         existing_user.verification_otp = hashed_otp
         existing_user.otp_expiry = otp_expiry
         existing_user.otp_attempts = 0
-
-        db.commit()
-
-        # Send new OTP
-        send_otp_email(
-            user.email,
-            otp
-        )
-
+        
+        try:
+            send_otp_email(user.email, otp)
+            db.commit()
+        
+        except Exception:
+            db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail="OTP could not be sent. Please try again."
+            )
+        
         return {
             "message": "New OTP sent. Please verify your email.",
             "user_id": existing_user.id
@@ -228,7 +242,6 @@ def register(
     hashed_password = Password_hash.hash(
         user.password
     )
-
     # Create user
     new_user = User(
         name=user.name,
@@ -241,14 +254,17 @@ def register(
     )
 
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    # Send OTP
-    send_otp_email(
-        user.email,
-        otp
-    )
+    try:
+        send_otp_email(user.email, otp)
+        db.commit()
+        db.refresh(new_user)
+    
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Registration failed. OTP could not be sent."
+        )
 
     return {
         "message": "User registration successful",
