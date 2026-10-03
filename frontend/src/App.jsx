@@ -844,69 +844,6 @@ Computer Move`,
 
     {
       id: 6,
-      title: "Banking Management System",
-      tech: "Python • MySQL",
-
-      description:
-        "A banking management application focused on user registration, login, account management and common banking operations with validation.",
-
-      features: [
-        "User registration",
-        "User login",
-        "Account management",
-        "Deposit",
-        "Withdrawal",
-        "Balance inquiry",
-        "Transaction handling",
-        "Input validation",
-      ],
-
-      architecture: `User
-  ↓
-Python Application
-  ↓
-Banking Logic
-  ↓
-MySQL Database`,
-
-      structure: `Application
-├── User Management
-├── Authentication
-├── Account Management
-├── Transactions
-└── Database Operations
-
-Database
-└── MySQL`,
-
-      flowTitle: "Transaction Flow",
-
-      flow: `User Request
-     ↓
-Validate Input
-     ↓
-Banking Operation
-     ↓
-Update Account Data
-     ↓
-MySQL
-     ↓
-Return Result`,
-
-      problems: [
-        "Banking operations require validation before modifying account data.",
-        "Account-related operations need consistent database updates.",
-      ],
-
-      future: [
-        "Transaction history",
-        "Improved authentication",
-        "Role-based access",
-        "Web-based interface",
-      ],
-    },
-    {
-      id: 7,
       title: "AI Email Automation System",
       tech: "Python • FastAPI • React • MySQL • SQLAlchemy • Groq AI",
 
