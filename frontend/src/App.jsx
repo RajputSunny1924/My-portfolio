@@ -905,6 +905,118 @@ Return Result`,
         "Web-based interface",
       ],
     },
+    {
+      id: 7,
+      title: "AI Email Automation System",
+      tech: "Python • FastAPI • React • MySQL • SQLAlchemy • Groq AI",
+
+      description:
+        "An AI-powered email automation system that reads pending emails from a MySQL database, classifies them using Groq AI, generates short summaries, performs category-based actions, and provides a React dashboard for monitoring email processing.",
+
+      features: [
+        "AI-powered email classification",
+        "Email summarization",
+        "Customer support email detection",
+        "Work email detection",
+        "Personal email detection",
+        "Spam email detection",
+        "Automatic action selection",
+        "MySQL email storage",
+        "SQLAlchemy ORM",
+        "FastAPI backend",
+        "React dashboard",
+        "Background worker for automatic processing",
+        "Pending email processing",
+        "Processed and error status tracking",
+        "Automatic retry handling",
+        "Maximum retry limit",
+        "Error state handling",
+        "Processing count tracking",
+      ],
+
+      architecture: `MySQL Database
+      ↓
+Pending Emails
+      ↓
+Background Worker
+      ↓
+FastAPI / AI Processing
+      ↓
+Groq AI
+      ↓
+Category + Summary + Action
+      ↓
+MySQL Database
+      ↓
+React Dashboard`,
+
+      structure: `frontend/
+├── src/
+│   ├── App.jsx
+│   ├── App.css
+│   └── main.jsx
+
+backend/
+├── main.py
+├── ai.py
+├── worker.py
+├── database.py
+├── models.py
+└── .env
+
+database/
+└── MySQL emails table`,
+
+      flowTitle: "AI Email Processing Flow",
+
+      flow: `Pending Email
+      ↓
+Worker Checks Database
+      ↓
+Send Email to Groq AI
+      ↓
+AI Classifies Email
+      ↓
+Generate Summary
+      ↓
+Select Action
+      ↓
+Update Database
+      ↓
+Execute Action
+      ↓
+Mark Email as Processed`,
+
+      security: [
+        "Groq API key is stored in environment variables.",
+        "AI processing is performed on the backend instead of exposing the API key to React.",
+        "CORS is configured for the React frontend.",
+        "Database credentials are stored using environment variables.",
+        "Input data is processed through the backend before database updates.",
+      ],
+
+      apis: ["GET /", "POST /process-emails", "GET /emails"],
+
+      problems: [
+        "AI responses initially required strict JSON parsing to reliably update the database.",
+        "Pending emails needed to be processed automatically without manually running the API every time.",
+        "AI or database failures could leave emails unprocessed.",
+        "A retry mechanism was implemented to handle temporary processing failures.",
+        "Emails that repeatedly fail processing are moved to an error state.",
+        "The React frontend and FastAPI backend required CORS configuration for local development.",
+      ],
+
+      future: [
+        "Gmail API integration",
+        "Outlook API integration",
+        "Automatic email fetching",
+        "Automatic email replies",
+        "Manual retry button for failed emails",
+        "Real-time worker monitoring",
+        "Cloud deployment",
+        "Advanced AI-based email actions",
+      ],
+    },
   ];
 
   // =====================================================
