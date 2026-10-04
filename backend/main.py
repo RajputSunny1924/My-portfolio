@@ -213,14 +213,13 @@ def register(
             send_otp_email(user.email, otp)
             db.commit()
         
-        except Exception as e:
-           db.rollback()
-           print("REGISTER EMAIL ERROR:", repr(e))
-           raise HTTPException(
-               status_code=500,
-               detail="Registration failed. OTP could not be sent."
-           )
-               
+        except Exception:
+            db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail="OTP could not be sent. Please try again."
+            )
+        
         return {
             "message": "New OTP sent. Please verify your email.",
             "user_id": existing_user.id
@@ -260,8 +259,9 @@ def register(
         db.commit()
         db.refresh(new_user)
     
-    except Exception:
+    except Exception as e:
         db.rollback()
+        print("REGISTER EMAIL ERROR:", repr(e))
         raise HTTPException(
             status_code=500,
             detail="Registration failed. OTP could not be sent."
