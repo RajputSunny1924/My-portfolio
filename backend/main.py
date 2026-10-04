@@ -24,7 +24,7 @@ ENV_FILE = BASE_DIR / ".env"
 load_dotenv(ENV_FILE)
 
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+app_password = os.getenv("EMAIL_APP_PASSWORD")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
@@ -56,8 +56,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://my-portfolio-h5de.onrender.com",
-        "http://localhost:6173"
-        ],
+        "http://localhost:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -537,18 +537,25 @@ def resend_otp(
     # New expiry: 5 minutes
     otp_expiry = datetime.now() + timedelta(minutes=5)
 
-    # Update OTP information
+       # Update OTP information
     user.verification_otp = hashed_otp
     user.otp_expiry = otp_expiry
     user.otp_attempts = 0
 
-    db.commit()
+    try:
+        send_otp_email(
+            user.email,
+            otp
+        )
 
-    # Send new OTP
-    send_otp_email(
-        user.email,
-        otp
-    )
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="OTP could not be sent. Please try again."
+        )
 
     return {
         "message": "New OTP sent successfully"
