@@ -14,9 +14,7 @@ import secrets
 import os
 import time
 import requests
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+
 # Environment variables
 BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
@@ -24,7 +22,8 @@ ENV_FILE = BASE_DIR / ".env"
 load_dotenv(ENV_FILE)
 
 brevo_api_key = os.getenv("BREVO_API_KEY")
-app_password = os.getenv("EMAIL_APP_PASSWORD")
+brevo_sender_email = os.getenv("BREVO_SENDER_EMAIL")
+
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
@@ -118,40 +117,55 @@ def generate_otp():
 def generate_csrf_token():
     return secrets.token_urlsafe(32)
 
-
 # Send OTP email
 def send_otp_email(to_email: str, otp: str):
-    sender_email = os.getenv("EMAIL_ADDRESS")
-    app_password = os.getenv("EMAIL_APP_PASSWORD")
+    api_key = os.getenv("BREVO_API_KEY")
+    sender_email = os.getenv("BREVO_SENDER_EMAIL")
 
-    if not sender_email or not app_password:
-        raise RuntimeError("Email configuration is missing")
+    if not api_key or not sender_email:
+        raise RuntimeError("Brevo email configuration is missing")
 
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "Your Email Verification OTP"
-    message["From"] = sender_email
-    message["To"] = to_email
+    url = "https://api.brevo.com/v3/smtp/email"
 
-    html = f"""
-    <html>
-        <body>
-            <h2>Email Verification</h2>
-            <p>Your OTP is:</p>
-            <h1>{otp}</h1>
-            <p>This OTP will expire in 5 minutes.</p>
-        </body>
-    </html>
-    """
+    headers = {
+        "accept": "application/json",
+        "api-key": api_key,
+        "content-type": "application/json"
+    }
 
-    message.attach(MIMEText(html, "html"))
+    payload = {
+        "sender": {
+            "name": "My Portfolio",
+            "email": sender_email
+        },
+        "to": [
+            {
+                "email": to_email
+            }
+        ],
+        "subject": "Your Email Verification OTP",
+        "htmlContent": f"""
+        <html>
+            <body>
+                <h2>Email Verification</h2>
+                <p>Your OTP is:</p>
+                <h1>{otp}</h1>
+                <p>This OTP will expire in 5 minutes.</p>
+            </body>
+        </html>
+        """
+    }
 
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.starttls()
-        server.login(sender_email, app_password)
-        server.sendmail(
-            sender_email,
-            to_email,
-            message.as_string()
+    response = requests.post(
+        url,
+        headers=headers,
+        json=payload,
+        timeout=15
+    )
+
+    if response.status_code not in (200, 201, 202):
+        raise RuntimeError(
+            f"Brevo email failed: {response.text}"
         )
 
 # Home
