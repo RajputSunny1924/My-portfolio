@@ -23,7 +23,7 @@ ENV_FILE = BASE_DIR / ".env"
 
 load_dotenv(ENV_FILE)
 
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+brevo_api_key = os.getenv("BREVO_API_KEY")
 app_password = os.getenv("EMAIL_APP_PASSWORD")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
