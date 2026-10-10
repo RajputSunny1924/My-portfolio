@@ -11,6 +11,7 @@ class User(Base):
     password = Column(String(255), nullable=False)
 
     is_verified = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
     verification_otp = Column(String(255), nullable=True)
     otp_expiry = Column(DateTime, nullable=True)
     otp_attempts = Column(Integer, default=0, nullable=False)

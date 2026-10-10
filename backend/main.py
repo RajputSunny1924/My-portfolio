@@ -54,7 +54,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://my-portfolio-h5de.onrender.com",
+        # "https://my-portfolio-h5de.onrender.com",
         "http://localhost:5173",
     ],
     allow_credentials=True,
@@ -88,7 +88,77 @@ def verify_token(
             status_code=401,
             detail="Invalid token"
         )
-    
+# Verify that the logged-in user is an admin
+def verify_admin(
+    payload: dict = Depends(verify_token),
+    db: Session = Depends(get_db)
+):
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authentication token"
+        )
+
+    user = db.query(User).filter(
+        User.id == user_id
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="User not found"
+        )
+
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
+
+    return user
+
+# Admin-only test endpoint
+@app.get("/admin/me")
+def admin_profile(
+    admin: User = Depends(verify_admin)
+):
+    return {
+        "message": "Admin access successful",
+        "id": admin.id,
+        "name": admin.name,
+        "email": admin.email,
+        "is_admin": admin.is_admin
+    }
+
+# Admin Dashboard Statistics
+@app.get("/admin/dashboard-stats")
+def admin_dashboard_stats(
+    admin: User = Depends(verify_admin),
+    db: Session = Depends(get_db)
+):
+    total_users = db.query(User).count()
+
+    verified_users = db.query(User).filter(
+        User.is_verified == True
+    ).count()
+
+    unverified_users = db.query(User).filter(
+        User.is_verified == False
+    ).count()
+
+    admin_users = db.query(User).filter(
+        User.is_admin == True
+    ).count()
+
+    return {
+        "total_users": total_users,
+        "verified_users": verified_users,
+        "unverified_users": unverified_users,
+        "admin_users": admin_users
+    }
+
 # Create JWT token
 def create_access_token(user_id: int, email: str):
     expire = datetime.utcnow() + timedelta(
