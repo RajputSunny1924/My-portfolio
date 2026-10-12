@@ -266,9 +266,7 @@ def register(
         User.email == user.email
     ).first()
 
-    # -------------------------
     # Existing user
-    # -------------------------
     if existing_user:
 
         # Already verified
@@ -309,11 +307,6 @@ def register(
             "user_id": existing_user.id
         }
 
-    # -------------------------
-    # New user
-    # -------------------------
-
-    # Generate OTP
     otp = generate_otp()
 
     # Hash OTP

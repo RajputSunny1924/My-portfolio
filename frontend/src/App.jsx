@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+const API_BASE = "http://127.0.0.1:8000";
+import AdminDashboard from "./AdminDashboard";
+
 function App() {
   // -------------------------
   // Authentication states
@@ -7,8 +10,11 @@ function App() {
 
   const [showLogin, setShowLogin] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loginError, setLoginError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   // -------------------------
   // Registration data
   // -------------------------
@@ -48,30 +54,34 @@ function App() {
   // -------------------------
   // Check authentication
   // -------------------------
-
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch(
-          "https://portfolio-backend-2swx.onrender.com/profile",
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
+        const response = await fetch(`${API_BASE}/profile`, {
+          method: "GET",
+          credentials: "include",
+        });
 
         if (response.ok) {
           setIsLoggedIn(true);
+
+          const adminResponse = await fetch(`${API_BASE}/admin/me`, {
+            method: "GET",
+            credentials: "include",
+          });
+
+          setIsAdmin(adminResponse.ok);
         } else {
           setIsLoggedIn(false);
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
-
         setIsLoggedIn(false);
+        setIsAdmin(false);
+      } finally {
+        setCheckingAuth(false);
       }
-
-      setCheckingAuth(false);
     };
 
     checkAuth();
@@ -103,13 +113,10 @@ function App() {
   const handleLogout = async () => {
     try {
       // Get CSRF token from backend
-      const csrfResponse = await fetch(
-        "https://portfolio-backend-2swx.onrender.com/csrf",
-        {
-          method: "GET",
-          credentials: "include",
-        },
-      );
+      const csrfResponse = await fetch(`${API_BASE}/csrf`, {
+        method: "GET",
+        credentials: "include",
+      });
 
       if (!csrfResponse.ok) {
         console.error("CSRF fetch failed:", csrfResponse.status);
@@ -119,16 +126,13 @@ function App() {
       const csrfData = await csrfResponse.json();
 
       // Logout request
-      const response = await fetch(
-        "https://portfolio-backend-2swx.onrender.com/logout",
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "X-CSRF-Token": csrfData.csrf_token,
-          },
+      const response = await fetch(`${API_BASE}/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "X-CSRF-Token": csrfData.csrf_token,
         },
-      );
+      });
 
       if (!response.ok) {
         console.error("Logout failed:", response.status);
@@ -173,16 +177,13 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch(
-        "https://portfolio-backend-2swx.onrender.com/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+      const response = await fetch(`${API_BASE}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(formData),
+      });
 
       const data = await response.json();
 
@@ -202,10 +203,15 @@ function App() {
           password: "",
         });
       } else {
-        console.error("Registration failed:", data.detail);
+        setLoginError(
+          typeof data.detail === "string"
+            ? data.detail
+            : "registration failed. please chek your input.",
+        );
       }
     } catch (error) {
       console.error("Registration error:", error);
+      setLoginError("Server se connection nahi ho pa raha. Please try again.");
     }
   };
 
@@ -217,17 +223,14 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch(
-        "https://portfolio-backend-2swx.onrender.com/verify-email",
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(verificationData),
+      const response = await fetch(`${API_BASE}/verify-email`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(verificationData),
+      });
 
       const data = await response.json();
 
@@ -257,18 +260,15 @@ function App() {
     event.preventDefault();
 
     try {
-      const response = await fetch(
-        "https://portfolio-backend-2swx.onrender.com/login",
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify(loginData),
+      const response = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+
+        body: JSON.stringify(loginData),
+      });
 
       const data = await response.json();
 
@@ -276,6 +276,13 @@ function App() {
 
       if (response.ok) {
         setIsLoggedIn(true);
+
+        const adminResponse = await fetch(`${API_BASE}/admin/me`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        setIsAdmin(adminResponse.ok);
 
         setLoginData({
           email: "",
@@ -316,6 +323,9 @@ function App() {
       </div>
     );
   }
+  if (isAdmin) {
+    return <AdminDashboard />;
+  }
 
   // =====================================================
   // LOGIN / REGISTER SCREEN
@@ -323,125 +333,279 @@ function App() {
 
   if (!isLoggedIn) {
     return (
-      <div>
-        <h1>My PortFolio</h1>
+      <div className="auth-page">
+        {/* BRAND / TITLE */}
+        <div className="auth-brand">
+          <div className="auth-logo">&lt;/&gt;</div>
+          <h1>
+            My<span>Portfolio</span>
+          </h1>
+          <p>Build · Learn · Grow</p>
+        </div>
 
-        {/* -------------------------
-            Verification Form
-        ------------------------- */}
+        {/* AUTHENTICATION CARD */}
+        <div className="auth-container">
+          {/* LEFT PANEL */}
+          <div className="auth-intro">
+            <h2>
+              Turning Ideas Into
+              <span> Real Projects</span>
+            </h2>
 
-        {showVerification ? (
-          <div>
-            <h2>Verify Your Email</h2>
+            <p>
+              A modern portfolio platform to showcase my skills, projects and
+              journey as a developer.
+            </p>
 
-            <p>OTP has been sent to your email.</p>
+            <div className="auth-features">
+              <div>⚡ Full Stack Development</div>
+              <div>🛡️ Secure Authentication</div>
+              <div>▤ Real-world Projects</div>
+              <div>☆ Always Learning</div>
+            </div>
 
-            <form onSubmit={handleVerifyEmail}>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={verificationData.email}
-                onChange={(event) =>
-                  setVerificationData({
-                    ...verificationData,
-                    email: event.target.value,
-                  })
-                }
-              />
-
-              <input
-                type="text"
-                name="otp"
-                placeholder="Enter OTP"
-                value={verificationData.otp}
-                onChange={(event) =>
-                  setVerificationData({
-                    ...verificationData,
-                    otp: event.target.value,
-                  })
-                }
-              />
-
-              <button type="submit">Verify Email</button>
-            </form>
+            <div className="auth-tagline">
+              Better Code.
+              <br />
+              Brighter Future.
+            </div>
           </div>
-        ) : showLogin ? (
-          /* -------------------------
-             Login Form
-          ------------------------- */
 
-          <div>
-            <h2>Login</h2>
+          {/* RIGHT PANEL */}
+          <div className="auth-panel">
+            {/* EMAIL VERIFICATION */}
+            {showVerification ? (
+              <div className="auth-form">
+                <div className="auth-heading-icon">✉</div>
 
-            <form onSubmit={handleLogin}>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={loginData.email}
-                onChange={handleLoginChange}
-                autoComplete="new-password"
-              />
-              {loginError && <p style={{ color: "red" }}>{loginError}</p>}
+                <h2>Verify Your Email</h2>
 
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={loginData.password}
-                onChange={handleLoginChange}
-                autoComplete="current-password"
-              />
+                <p className="auth-description">
+                  OTP has been sent to your email.
+                </p>
 
-              <button type="submit">Login</button>
-            </form>
+                <form onSubmit={handleVerifyEmail}>
+                  <label>Email Address</label>
 
-            <p>Don't have an account?</p>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value={verificationData.email}
+                    onChange={(event) =>
+                      setVerificationData({
+                        ...verificationData,
+                        email: event.target.value,
+                      })
+                    }
+                    autoComplete="email"
+                    required
+                  />
 
-            <button onClick={() => setShowLogin(false)}>Create Account</button>
+                  <label>Verification Code</label>
+
+                  <input
+                    type="text"
+                    name="otp"
+                    placeholder="Enter OTP"
+                    value={verificationData.otp}
+                    onChange={(event) =>
+                      setVerificationData({
+                        ...verificationData,
+                        otp: event.target.value,
+                      })
+                    }
+                    required
+                  />
+
+                  <button type="submit" className="auth-submit">
+                    Verify Email →
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <>
+                {/* LOGIN / REGISTER TABS */}
+                <div className="auth-tabs">
+                  <button
+                    type="button"
+                    className={`auth-tab ${showLogin ? "active" : ""}`}
+                    onClick={() => setShowLogin(true)}>
+                    <span>♙</span> Login
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`auth-tab ${!showLogin ? "active" : ""}`}
+                    onClick={() => setShowLogin(false)}>
+                    <span>♙+</span> Register
+                  </button>
+                </div>
+
+                {/* LOGIN FORM */}
+                {showLogin ? (
+                  <div className="auth-form">
+                    <h2>Welcome Back</h2>
+
+                    <p className="auth-description">
+                      Sign in to your account to continue.
+                    </p>
+
+                    <form onSubmit={handleLogin}>
+                      <label>Email Address</label>
+
+                      <div className="auth-input-wrap">
+                        <span className="auth-input-icon">✉</span>
+
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="Enter your email"
+                          value={loginData.email}
+                          onChange={handleLoginChange}
+                          autoComplete="email"
+                          required
+                        />
+                      </div>
+
+                      <label>Password</label>
+
+                      <div className="auth-input-wrap password-field">
+                        <span className="auth-input-icon">♙</span>
+
+                        <input
+                          type={showLoginPassword ? "text" : "password"}
+                          name="password"
+                          placeholder="Enter your password"
+                          value={loginData.password}
+                          onChange={handleLoginChange}
+                          autoComplete="current-password"
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          className="password-toggle"
+                          onClick={() =>
+                            setShowLoginPassword(!showLoginPassword)
+                          }
+                          aria-label={
+                            showLoginPassword
+                              ? "Hide password"
+                              : "Show password"
+                          }>
+                          {showLoginPassword ? "🙈" : "👁"}
+                        </button>
+                      </div>
+
+                      {loginError && <p className="auth-error">{loginError}</p>}
+
+                      <button type="submit" className="auth-submit">
+                        Login →
+                      </button>
+                    </form>
+
+                    <div className="auth-bottom-text">
+                      Don't have an account?{" "}
+                      <button type="button" onClick={() => setShowLogin(false)}>
+                        Create Account
+                      </button>
+                    </div>
+
+                    <div className="auth-security">
+                      🛡 Your account is protected by secure authentication.
+                    </div>
+                  </div>
+                ) : (
+                  /* REGISTER FORM */
+                  <div className="auth-form">
+                    <h2>Create Account</h2>
+
+                    <p className="auth-description">
+                      Join us and start building your portfolio.
+                    </p>
+
+                    <form onSubmit={handleRegister}>
+                      <label>Full Name</label>
+
+                      <div className="auth-input-wrap">
+                        <span className="auth-input-icon">♙</span>
+
+                        <input
+                          type="text"
+                          name="name"
+                          placeholder="Enter your full name"
+                          value={formData.name}
+                          onChange={handleRegisterChange}
+                          autoComplete="name"
+                          required
+                        />
+                      </div>
+
+                      <label>Email Address</label>
+
+                      <div className="auth-input-wrap">
+                        <span className="auth-input-icon">✉</span>
+
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="Enter your email address"
+                          value={formData.email}
+                          onChange={handleRegisterChange}
+                          autoComplete="email"
+                          required
+                        />
+                      </div>
+
+                      <label>Password</label>
+
+                      <div className="auth-input-wrap password-field">
+                        <span className="auth-input-icon">♙</span>
+
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          placeholder="Create a password"
+                          value={formData.password}
+                          onChange={handleRegisterChange}
+                          autoComplete="new-password"
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          className="password-toggle"
+                          onClick={() => setShowPassword(!showPassword)}
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }>
+                          {showPassword ? "🙈" : "👁"}
+                        </button>
+                      </div>
+                      {loginError && <p className="auth-error">{loginError}</p>}
+
+                      <button type="submit" className="auth-submit">
+                        Create Account →
+                      </button>
+                    </form>
+
+                    <div className="auth-bottom-text">
+                      Already have an account?{" "}
+                      <button type="button" onClick={() => setShowLogin(true)}>
+                        Login
+                      </button>
+                    </div>
+
+                    <div className="auth-security">
+                      🛡 Your data is protected by secure authentication.
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        ) : (
-          /* -------------------------
-             Registration Form
-          ------------------------- */
-
-          <div>
-            <h2>Create Account</h2>
-
-            <form onSubmit={handleRegister}>
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={formData.name}
-                onChange={handleRegisterChange}
-              />
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleRegisterChange}
-              />
-
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleRegisterChange}
-              />
-
-              <button type="submit">Register</button>
-            </form>
-
-            <p>Already have an account?</p>
-
-            <button onClick={() => setShowLogin(true)}>Login</button>
-          </div>
-        )}
+        </div>
       </div>
     );
   }
