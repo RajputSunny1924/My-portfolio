@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 
 const API_BASE = "https://portfolio-backend-2swx.onrender.com";
 // const API_BASE = "http://127.0.0.1:8000";
-function AdminDashboard() {
+function AdminDashboard({ onBackToPortfolio }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -165,12 +167,36 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <button
-          className="admin-logout-btn"
-          onClick={handleLogout}
-          disabled={loggingOut}>
-          {loggingOut ? "Logging out..." : "Logout ↗"}
-        </button>
+        <div className="menu-container">
+          <button
+            type="button"
+            className="menu-toggle"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="Open account menu"
+            aria-expanded={menuOpen}>
+            ⋮
+          </button>
+
+          {menuOpen && (
+            <div className="dropdown-menu">
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onBackToPortfolio();
+                }}>
+                🏠 Back to Portfolio
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}>
+                🚪 {loggingOut ? "Logging out..." : "Logout"}
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <section className="admin-content">

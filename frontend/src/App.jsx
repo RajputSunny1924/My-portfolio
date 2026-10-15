@@ -16,6 +16,9 @@ function App() {
   const [loginError, setLoginError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   // -------------------------
   // Registration data
   // -------------------------
@@ -324,8 +327,10 @@ function App() {
       </div>
     );
   }
-  if (isAdmin) {
-    return <AdminDashboard />;
+  if (isAdmin && showAdminDashboard) {
+    return (
+      <AdminDashboard onBackToPortfolio={() => setShowAdminDashboard(false)} />
+    );
   }
 
   // =====================================================
@@ -337,9 +342,9 @@ function App() {
       <div className="auth-page">
         {/* BRAND / TITLE */}
         <div className="auth-brand">
-          <div className="auth-logo">&lt;/&gt;</div>
+          <div className="auth-logo"></div>
           <h1>
-            My<span>Portfolio</span>
+            My <span>Portfolio</span>
           </h1>
           <p>Build · Learn · Grow</p>
         </div>
@@ -1134,13 +1139,46 @@ Mark Email as Processed`,
       <nav>
         <h2>My Portfolio</h2>
 
-        <div>
+        <div className="nav-links">
           <a href="#home">Home</a>
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
           <a href="#contact">Contact</a>
 
-          <button onClick={handleLogout}>Logout</button>
+          <div className="menu-container">
+            <button
+              type="button"
+              className="menu-toggle"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-label="Open account menu"
+              aria-expanded={menuOpen}>
+              ⋮
+            </button>
+
+            {menuOpen && (
+              <div className="dropdown-menu">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAdminDashboard(true);
+                      setMenuOpen(false);
+                    }}>
+                    ⚙️ Admin Dashboard
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleLogout();
+                  }}>
+                  🚪 Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 
