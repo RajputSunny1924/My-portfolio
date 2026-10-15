@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 
 const API_BASE = "https://portfolio-backend-2swx.onrender.com";
-
+// const API_BASE = "http://127.0.0.1:8000";
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [loggingOut, setLoggingOut] = useState(false);
+
+  // User Management States
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [usersError, setUsersError] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+
+  const limit = 10;
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -34,6 +44,49 @@ function AdminDashboard() {
 
     fetchStats();
   }, []);
+
+  // Fetch users from backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setUsersLoading(true);
+      setUsersError("");
+
+      try {
+        const params = new URLSearchParams({
+          search: search.trim(),
+          page: String(page),
+          limit: String(limit),
+        });
+
+        const response = await fetch(
+          `${API_BASE}/admin/users?${params.toString()}`,
+          {
+            method: "GET",
+            credentials: "include",
+          },
+        );
+
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Admin access denied. Please login again.");
+          }
+
+          throw new Error("Failed to load users.");
+        }
+
+        const data = await response.json();
+
+        setUsers(data.users);
+        setPagination(data.pagination);
+      } catch (err) {
+        setUsersError(err.message || "Something went wrong.");
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [search, page]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -162,13 +215,104 @@ function AdminDashboard() {
               ))}
             </div>
 
-            <section className="admin-management-placeholder">
-              <div>
-                <h3>User Management</h3>
-                <p>Manage registered accounts and verification status.</p>
+            <section className="admin-management">
+              <div className="admin-management-header">
+                <div>
+                  <h3>User Management</h3>
+                  <p>Manage registered accounts and verification status.</p>
+                </div>
+
+                <span>Total Users: {pagination?.total ?? 0}</span>
               </div>
 
-              <span className="admin-coming-soon">Coming next</span>
+              {/* Search Box */}
+              <input
+                type="search"
+                placeholder="Search by name or email..."
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setPage(1);
+                }}
+              />
+
+              {/* Loading and Error */}
+              {usersLoading && <p>Loading users...</p>}
+
+              {usersError && <p role="alert">{usersError}</p>}
+
+              {/* Users Table */}
+              {!usersLoading && !usersError && (
+                <div className="admin-table-wrapper">
+                  <table className="admin-users-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Verification</th>
+                        <th>Role</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {users.length > 0 ? (
+                        users.map((user) => (
+                          <tr key={user.id}>
+                            <td>{user.id}</td>
+                            <td>{user.name}</td>
+                            <td>{user.email}</td>
+
+                            <td>
+                              <span
+                                className={`admin-user-badge ${
+                                  user.is_verified
+                                    ? "is-verified"
+                                    : "is-unverified"
+                                }`}>
+                                {user.is_verified ? "Verified" : "Unverified"}
+                              </span>
+                            </td>
+
+                            <td>
+                              <span
+                                className={`admin-user-badge ${
+                                  user.is_admin ? "is-admin" : "is-user"
+                                }`}>
+                                {user.is_admin ? "Admin" : "User"}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="5">No users found.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {/* Pagination */}
+              {pagination && pagination.total_pages > 1 && (
+                <div className="admin-pagination">
+                  <button
+                    onClick={() => setPage((previousPage) => previousPage - 1)}
+                    disabled={page === 1 || usersLoading}>
+                    ← Previous
+                  </button>
+
+                  <span>
+                    Page {pagination.page} of {pagination.total_pages}
+                  </span>
+
+                  <button
+                    onClick={() => setPage((previousPage) => previousPage + 1)}
+                    disabled={page === pagination.total_pages || usersLoading}>
+                    Next →
+                  </button>
+                </div>
+              )}
             </section>
 
             <footer className="admin-footer">
