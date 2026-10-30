@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "./services/api";
 
-const API_BASE = "https://portfolio-backend-2swx.onrender.com";
-// const API_BASE = "http://127.0.0.1:8000";
 function AdminDashboard({ onBackToPortfolio }) {
   const [menuOpen, setMenuOpen] = useState(false);
 

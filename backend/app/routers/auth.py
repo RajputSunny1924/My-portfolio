@@ -1,309 +1,27 @@
-from fastapi import FastAPI, Depends, HTTPException, Response, Cookie, Header, Request
+from fastapi import APIRouter, Depends, HTTPException, Response, Cookie, Request
 from sqlalchemy.orm import Session
-from schemas import UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail, ResendOTP
-from database import Base, engine, get_db
-from models import User
-from pwdlib import PasswordHash
-from jose import jwt, JWTError
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-from pathlib import Path
-import secrets
-import os
 import time
-import requests
 
-# Environment variables
-BASE_DIR = Path(__file__).resolve().parent
-ENV_FILE = BASE_DIR / ".env"
-
-load_dotenv(ENV_FILE)
-
-brevo_api_key = os.getenv("BREVO_API_KEY")
-brevo_sender_email = os.getenv("BREVO_SENDER_EMAIL")
-
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY is not configured")
-
-ALGORITHM = "HS256"
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        response = await call_next(request)
-
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-
-        return response
-
-
-app.add_middleware(SecurityHeadersMiddleware)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://my-portfolio-h5de.onrender.com",
-        # "http://localhost:5173",
-        # "http://127.0.0.1:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+from app.database import get_db
+from app.models import User
+from app.schemas import UserCreate, UserLogin, RegisterResponse, LoginResponse, VerifyEmail, ResendOTP
+from app.security import (
+    Password_hash,
+    create_access_token,
+    generate_otp,
+    generate_csrf_token,
+    verify_token,
+    verify_csrf_token,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
 )
+from app.email_service import send_otp_email
 
-Password_hash = PasswordHash.recommended()
+router = APIRouter(tags=["auth"])
 
-# verify token
-def verify_token(
-    access_token: str | None = Cookie(default=None)
-):
-    if not access_token:
-        raise HTTPException(
-            status_code=401,
-            detail="Not authenticated"
-        )
-
-    try:
-        payload = jwt.decode(
-            access_token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-
-        return payload
-
-    except JWTError:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token"
-        )
-# Verify that the logged-in user is an admin
-def verify_admin(
-    payload: dict = Depends(verify_token),
-    db: Session = Depends(get_db)
-):
-    user_id = payload.get("user_id")
-
-    if not user_id:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authentication token"
-        )
-
-    user = db.query(User).filter(
-        User.id == user_id
-    ).first()
-
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="User not found"
-        )
-
-    if not user.is_admin:
-        raise HTTPException(
-            status_code=403,
-            detail="Admin access required"
-        )
-
-    return user
-
-# Admin-only test endpoint
-@app.get("/admin/me")
-def admin_profile(
-    admin: User = Depends(verify_admin)
-):
-    return {
-        "message": "Admin access successful",
-        "id": admin.id,
-        "name": admin.name,
-        "email": admin.email,
-        "is_admin": admin.is_admin
-    }
-
-# Admin Dashboard Statistics
-@app.get("/admin/dashboard-stats")
-def admin_dashboard_stats(
-    admin: User = Depends(verify_admin),
-    db: Session = Depends(get_db)
-):
-    total_users = db.query(User).count()
-
-    verified_users = db.query(User).filter(
-        User.is_verified == True
-    ).count()
-
-    unverified_users = db.query(User).filter(
-        User.is_verified == False
-    ).count()
-
-    admin_users = db.query(User).filter(
-        User.is_admin == True
-    ).count()
-
-    return {
-        "total_users": total_users,
-        "verified_users": verified_users,
-        "unverified_users": unverified_users,
-        "admin_users": admin_users
-    }
-@app.get("/admin/users")
-def get_admin_users(
-    search: str = "",
-    page: int = 1,
-    limit: int = 10,
-    admin: User = Depends(verify_admin),
-    db: Session = Depends(get_db)
-):
-    if page < 1 or limit > 100:
-        raise HTTPException(
-            status_code=400,
-            detail = "page must be greater than 0"
-        )
-    if limit < 1 or limit > 100:
-        raise HTTPException(
-            status_code=400,
-            detail = "limits must be betweem 1 to  100",
-        )
-    query = db.query(User)
-    if search.strip():
-        search_term = f"%{search.strip()}%"
-        query = query.filter(
-            (User.name.ilike(search_term)) |
-            (User.email.ilike(search_term))
-        )
-    total_users = query.count()
-
-    users = (
-        query
-        .order_by(User.id.desc())
-        .offset((page - 1) * limit)
-        .limit(limit)
-        .all()
-    )
-    return {
-        "users": [
-            {
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "is_verified": user.is_verified,
-                "is_admin": user.is_admin
-            }
-            for user in users
-
-        ],
-        "pagination":{
-            "page":page,
-            "limit":limit,
-            "total":total_users,
-            "total_pages":(total_users+limit - 1)//limit
-        }
-    }
-
-
-    
-
-
-    
-# Create JWT token
-def create_access_token(user_id: int, email: str):
-    expire = datetime.utcnow() + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-    )
-    payload = {
-        "user_id": user_id,
-        "email": email,
-        "exp": expire
-
-    }
-    token = jwt.encode(
-        payload,
-        SECRET_KEY,
-        algorithm=ALGORITHM
-    )
-    return token
-    
-# Generate OTP
-def generate_otp():
-    return str(
-        secrets.randbelow(900000) + 100000
-    )
-
-# Generate CSRF Token
-def generate_csrf_token():
-    return secrets.token_urlsafe(32)
-
-# Send OTP email
-def send_otp_email(to_email: str, otp: str):
-    api_key = os.getenv("BREVO_API_KEY")
-    sender_email = os.getenv("BREVO_SENDER_EMAIL")
-
-    if not api_key or not sender_email:
-        raise RuntimeError("Brevo email configuration is missing")
-
-    url = "https://api.brevo.com/v3/smtp/email"
-
-    headers = {
-        "accept": "application/json",
-        "api-key": api_key,
-        "content-type": "application/json"
-    }
-
-    payload = {
-        "sender": {
-            "name": "My Portfolio",
-            "email": sender_email
-        },
-        "to": [
-            {
-                "email": to_email
-            }
-        ],
-        "subject": "Your Email Verification OTP",
-        "htmlContent": f"""
-        <html>
-            <body>
-                <h2>Email Verification</h2>
-                <p>Your OTP is:</p>
-                <h1>{otp}</h1>
-                <p>This OTP will expire in 5 minutes.</p>
-            </body>
-        </html>
-        """
-    }
-
-    response = requests.post(
-        url,
-        headers=headers,
-        json=payload,
-        timeout=15
-    )
-
-    if response.status_code not in (200, 201, 202):
-        raise RuntimeError(
-            f"Brevo email failed: {response.text}"
-        )
-
-# Home
-@app.get("/")
-def home():
-    return {"message": "backend is connected succesfuly 😎"}
 
 # Protected Profile
-@app.get("/profile")
+@router.get("/profile")
 def profile(
     payload: dict = Depends(verify_token)):
     return {
@@ -312,8 +30,9 @@ def profile(
         "email": payload["email"]
     }
 
+
 # Register
-@app.post(
+@router.post(
     "/register",
     response_model=RegisterResponse
 )
@@ -415,11 +134,11 @@ MAX_LOGIN_ATTEMPTS = 5
 BLOCK_TIME = 60
 
 # Login
-@app.post("/login", response_model=LoginResponse)
+@router.post("/login", response_model=LoginResponse)
 def login(
     user: UserLogin,
-    response:Response,
-    request:Request,
+    response: Response,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     client_ip = request.client.host
@@ -515,26 +234,9 @@ def login(
         "message": "Login successful",
         "csrf_token": csrf_token
     }
-def verify_csrf_token(
-    csrf_token: str | None = Cookie(default=None),
-    x_csrf_token: str | None = Header(default=None),
-):
-    if not csrf_token or not x_csrf_token:
-        raise HTTPException(
-            status_code=403,
-            detail="CSRF token missing"
-        )
 
-    if not secrets.compare_digest(
-        csrf_token,
-        x_csrf_token
-    ):
-        raise HTTPException(
-            status_code=403,
-            detail="Invalid CSRF token"
-        )
 
-@app.get("/csrf")
+@router.get("/csrf")
 def get_csrf_token(
     response: Response,
     csrf_token: str | None = Cookie(default=None)
@@ -553,8 +255,10 @@ def get_csrf_token(
         )
 
     return {"csrf_token": csrf_token}
+
+
 # Logout
-@app.post("/logout")
+@router.post("/logout")
 def logout(response: Response,
     _: None = Depends(verify_csrf_token)
 ):
@@ -578,8 +282,9 @@ def logout(response: Response,
         "message": "Logout successful"
     }
 
+
 # Verify Email
-@app.post("/verify-email")
+@router.post("/verify-email")
 def verify_email(
     data: VerifyEmail,
     db: Session = Depends(get_db)):
@@ -644,7 +349,9 @@ def verify_email(
     return {
         "message": "Email verified successfully"
     }
-@app.post("/resend-otp")
+
+
+@router.post("/resend-otp")
 def resend_otp(
     data: ResendOTP,
     db: Session = Depends(get_db)

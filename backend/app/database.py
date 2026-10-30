@@ -1,8 +1,13 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker,declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
+from pathlib import Path
 import os
 
+# Load environment variables from backend/.env
+BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_FILE = BASE_DIR / ".env"
+load_dotenv(ENV_FILE)
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -30,4 +35,4 @@ def get_db():
     try:
         yield db
     finally:
-        db.close() 
+        db.close()
