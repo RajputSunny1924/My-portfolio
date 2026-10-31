@@ -1,7 +1,21 @@
 import { useState } from "react";
 
-function Navbar({ isAdmin, onOpenAdminDashboard, onLogout }) {
+function Navbar({
+  isLoggedIn,
+  isAdmin,
+  onOpenAdminDashboard,
+  onOpenAuth,
+  onLogout,
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleAuthClick = () => {
+    setMenuOpen(false);
+
+    if (onOpenAuth) {
+      onOpenAuth();
+    }
+  };
 
   return (
     <nav>
@@ -25,29 +39,35 @@ function Navbar({ isAdmin, onOpenAdminDashboard, onLogout }) {
 
           {menuOpen && (
             <div className="dropdown-menu">
+              {!isLoggedIn && (
+                <>
+                  <button type="button" onClick={handleAuthClick}>
+                    Login / Register
+                  </button>
+                </>
+              )}
+
               {isAdmin && (
                 <button
                   type="button"
                   onClick={() => {
-                    if (onOpenAdminDashboard) {
-                      onOpenAdminDashboard();
-                    }
+                    onOpenAdminDashboard?.();
                     setMenuOpen(false);
                   }}>
                   ⚙️ Admin Dashboard
                 </button>
               )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  if (onLogout) {
-                    onLogout();
-                  }
-                }}>
-                🚪 Logout
-              </button>
+              {isLoggedIn && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onLogout?.();
+                  }}>
+                  🚪 Logout
+                </button>
+              )}
             </div>
           )}
         </div>

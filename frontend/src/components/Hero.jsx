@@ -1,29 +1,81 @@
 function Hero() {
   return (
-    <section id="home">
-      <div className="hero-visuals" aria-hidden="true">
-        <span className="hero-visual hero-visual--one" />
-        <span className="hero-visual hero-visual--two" />
-        <span className="hero-visual hero-visual--three" />
-      </div>
+    <section id="home" className="hero-section" data-reveal>
+      <div className="hero-copy">
+        <p className="hero-kicker">
+          <span className="hero-kicker-line"></span>
+          FULL STACK DEVELOPER
+        </p>
 
-      <div className="hero-content">
-        <p className="hero-kicker">// Building thoughtful digital systems</p>
-        <h1>Hi, I'm Sunny Singh</h1>
+        <h1 className="hero-heading">
+          <span className="reveal-line">
+            <span>Building</span>
+          </span>
 
-        <h2>
-          <span>Full Stack Developer</span>
+          <span className="reveal-line">
+            <span className="accent-text">Digital</span>
+          </span>
+
+          <span className="reveal-line">
+            <span>Experiences.</span>
+          </span>
+        </h1>
+
+        <h2 className="hero-subheading">
+          Hi, I'm <span className="hero-typing-text">Sunny Singh</span>
         </h2>
 
-        <p>
-          I build practical applications using Python, FastAPI, React and
-          MySQL.
+        <p className="hero-description">
+          I design and develop modern web applications that combine thoughtful
+          user experiences with powerful backend systems. Turning ideas into
+          practical digital products.
         </p>
 
-        <p>
-          Interested in backend development, full-stack applications and AI
-          automation.
-        </p>
+        <div className="hero-socials">
+          <a
+            href="https://github.com/RajputSunny1924"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub">
+            GH <span>↗</span>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/sunny-singh-rajput-677471417"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn">
+            IN <span>↗</span>
+          </a>
+        </div>
+
+        <div className="hero-actions">
+          <a href="#projects" className="hero-primary-btn">
+            Explore Projects <span>↗</span>
+          </a>
+
+          <a href="#contact" className="hero-secondary-btn">
+            Let's Talk
+          </a>
+        </div>
+      </div>
+
+      <div className="hero-profile" data-reveal>
+        <div className="hero-profile-glow"></div>
+
+        <img
+          src="/sunny-profile.png"
+          alt="Sunny Singh - Full Stack Developer"
+          className="hero-profile-image"
+          loading="eager"
+        />
+      </div>
+
+      <div className="hero-bottom-line" data-reveal>
+        <span>REACT</span>
+        <span>PYTHON</span>
+        <span>FASTAPI</span>
+        <span>WEB DEVELOPMENT</span>
       </div>
     </section>
   );
