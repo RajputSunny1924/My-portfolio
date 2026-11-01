@@ -14,7 +14,9 @@ function About() {
           </h2>
 
           <p>
-            The person behind the code, the ideas and the digital experiences.
+            I'm a BSc IT student and Full Stack Developer based in Mumbai,
+            India. I specialize in building modern, responsive websites and
+            secure web applications for businesses and individuals.
           </p>
         </div>
 
@@ -27,10 +29,12 @@ function About() {
               <div className="about-visual-symbol">{"</>"}</div>
 
               <h3>
-                Building with
-                <span> Logic & Creativity.</span>
+                I'm Sunny Singh Rajput,
+                <span>
+                  {" "}
+                  a Full Stack Developer and Freelance Web Developer.
+                </span>
               </h3>
-
               <p>
                 I believe great websites are not just about appearance. They
                 should solve problems, deliver value and create meaningful

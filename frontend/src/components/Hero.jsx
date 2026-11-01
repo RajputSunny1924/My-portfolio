@@ -22,13 +22,13 @@ function Hero() {
         </h1>
 
         <h2 className="hero-subheading">
-          Hi, I'm <span className="hero-typing-text">Sunny Singh</span>
+          Hi, I'm <span className="hero-typing-text">Sunny Singh Rajput</span>
         </h2>
 
         <p className="hero-description">
-          I design and develop modern web applications that combine thoughtful
-          user experiences with powerful backend systems. Turning ideas into
-          practical digital products.
+          I'm Sunny Singh Rajput, a Full Stack Developer and Freelance Web
+          Developer based in Mumbai, India. I build modern, responsive websites
+          and custom web applications for businesses and individuals.
         </p>
 
         <div className="hero-socials">
@@ -65,7 +65,7 @@ function Hero() {
 
         <img
           src="/sunny-profile.png"
-          alt="Sunny Singh - Full Stack Developer"
+          alt="Sunny Singh Rajput - Full Stack Developer and Freelance Web Developer"
           className="hero-profile-image"
           loading="eager"
         />

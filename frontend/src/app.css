@@ -754,18 +754,6 @@ nav h2::after {
   letter-spacing: 1px;
 }
 
-.hero-status-dot {
-  width: 8px;
-  height: 8px;
-
-  background: #6ddba0;
-  border-radius: 50%;
-
-  box-shadow: 0 0 12px rgba(109, 219, 160, 0.6);
-
-  animation: statusPulse 2s infinite;
-}
-
 /* =========================================
    HERO BOTTOM SKILLS
 ========================================= */
@@ -1819,7 +1807,6 @@ Append at the END of app.css
   position: relative;
   width: 0;
   max-width: max-content;
-  overflow: hidden;
   white-space: nowrap;
   vertical-align: bottom;
   border-right: 2px solid currentColor;
@@ -1833,7 +1820,7 @@ Append at the END of app.css
     width: 0;
   }
   to {
-    width: 12ch;
+    width: 14ch;
   }
 }
 
