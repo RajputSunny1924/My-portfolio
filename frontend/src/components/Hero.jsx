@@ -64,10 +64,13 @@ function Hero() {
         <div className="hero-profile-glow"></div>
 
         <img
-          src="/sunny-profile.png"
-          alt="Sunny Singh Rajput - Full Stack Developer and Freelance Web Developer"
+          src="/sunny-profile.webp"
+          alt="Sunny Singh Rajput"
           className="hero-profile-image"
           loading="eager"
+          fetchPriority="high"
+          width="560"
+          height="683"
         />
       </div>
 

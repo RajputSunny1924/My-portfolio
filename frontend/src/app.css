@@ -24,7 +24,7 @@
   --border-hover: rgba(149, 133, 255, 0.35);
 
   /* Typography */
-  --font-heading: "Sora", sans-serif;
+  --font-heading: "manrope", sans-serif;
   --font-body: "Manrope", sans-serif;
 
   /* Layout */
@@ -1743,7 +1743,7 @@ Append at the END of app.css
 /* TYPOGRAPHY REFINEMENT */
 
 .hero-heading {
-  font-family: "Sora", "Manrope", sans-serif;
+  font-family: "Manrope", sans-serif;
   font-weight: 800;
   letter-spacing: -0.065em;
   line-height: 0.98;

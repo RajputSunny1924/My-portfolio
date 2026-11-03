@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import AdminDashboard from "./AdminDashboard";
+import { lazy, Suspense } from "react";
+
+const AdminDashboard = lazy(() => import("./AdminDashboard"));
 import {
   checkAdminStatus,
   checkAuthProfile,
@@ -184,7 +186,11 @@ function App() {
 
   // Admin Dashboard
   if (isAdmin && showAdminDashboard) {
-    return <AdminDashboard onBackToPortfolio={handleBackToPortfolio} />;
+    return (
+      <Suspense fallback={<div>Loading dashboard...</div>}>
+        <AdminDashboard onBackToPortfolio={handleBackToPortfolio} />
+      </Suspense>
+    );
   }
 
   // Public Portfolio
