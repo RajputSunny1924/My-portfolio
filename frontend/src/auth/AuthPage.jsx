@@ -245,23 +245,6 @@ function AuthPage({ onLoginSuccess }) {
             </div>
           ) : (
             <>
-              {/* LOGIN / REGISTER TABS */}
-              <div className="auth-tabs">
-                <button
-                  type="button"
-                  className={`auth-tab ${showLogin ? "active" : ""}`}
-                  onClick={() => setShowLogin(true)}>
-                  <span>♙</span> Login
-                </button>
-
-                <button
-                  type="button"
-                  className={`auth-tab ${!showLogin ? "active" : ""}`}
-                  onClick={() => setShowLogin(false)}>
-                  <span>♙+</span> Register
-                </button>
-              </div>
-
               {/* LOGIN FORM */}
               {showLogin ? (
                 <div className="auth-form">

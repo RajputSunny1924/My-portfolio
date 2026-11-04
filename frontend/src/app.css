@@ -722,39 +722,6 @@ nav h2::after {
 }
 
 /* =========================================
-   PROFILE STATUS
-========================================= */
-
-.hero-image-caption {
-  position: absolute;
-  z-index: 2;
-
-  bottom: 25px;
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  width: max-content;
-  padding: 12px 17px;
-
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  background: rgba(15, 16, 21, 0.88);
-  backdrop-filter: blur(15px);
-
-  border: 1px solid var(--border-primary);
-  border-radius: 30px;
-
-  color: var(--text-primary);
-
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-/* =========================================
    HERO BOTTOM SKILLS
 ========================================= */
 
@@ -3114,30 +3081,6 @@ PROJECTS — PREMIUM CASE STUDY DESIGN
 
 /* LOGIN / REGISTER TABS */
 
-.auth-tabs {
-  display: flex;
-  gap: 8px;
-  padding: 5px;
-  margin-bottom: 32px;
-  background: #191919;
-  border: 1px solid #292929;
-  border-radius: 9px;
-}
-
-.auth-tab {
-  flex: 1;
-  padding: 12px;
-  color: #888;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
 .auth-tab.active {
   color: #111;
   background: #fff;
@@ -3369,10 +3312,6 @@ PROJECTS — PREMIUM CASE STUDY DESIGN
 
   .auth-form h2 {
     font-size: 25px;
-  }
-
-  .auth-tabs {
-    margin-bottom: 27px;
   }
 
   .auth-input-wrap input,
