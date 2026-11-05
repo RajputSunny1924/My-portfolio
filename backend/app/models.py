@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
-from app.database import Base
+from datetime import datetime
 
+from sqlalchemy import Column, Integer, String, Boolean, DateTime,Text
+from app.database import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -43,4 +44,37 @@ class VisitorEvent(Base):
         DateTime,
         nullable=False,
         index=True
+    )
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    rating = Column(Integer, nullable=False)
+
+    message = Column(Text, nullable=False)
+
+    status = Column(
+        String(20),
+        nullable=False,
+        default="published",
+        index=True
+    )
+
+    edit_token_hash = Column(
+        String(64),
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        index=True
+    )
+
+    updated_at = Column(
+        DateTime,
+        nullable=True
     )

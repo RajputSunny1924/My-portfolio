@@ -19,7 +19,7 @@ load_dotenv(ENV_FILE)
 load_dotenv()
 
 from app.database import Base, engine
-from app.routers import auth, admin, analytics
+from app.routers import auth, admin, analytics,feedback
 
 # Database tables
 Base.metadata.create_all(bind=engine)
@@ -45,7 +45,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(SecurityHeadersMiddleware)
-
+app.include_router(feedback.router)
 
 # Allowed frontend origins
 allowed_origins = [

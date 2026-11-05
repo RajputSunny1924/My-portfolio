@@ -8,6 +8,7 @@ import {
   getCsrfToken,
   logoutUser,
 } from "./auth/authService";
+import PortfolioInsights from "./components/PortfolioInsights";
 import Services from "./components/services";
 import About from "./components/About";
 import Contact from "./components/Contact";
@@ -17,6 +18,7 @@ import Navbar from "./components/Navbar";
 import Projects from "./components/Projects";
 import AuthPage from "./auth/AuthPage";
 import { trackPageView } from "./services/analyticsService";
+import VisitorCounter from "./components/Visitorcounter";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -34,19 +36,25 @@ function App() {
   const [analyticsConsent, setAnalyticsConsent] = useState(() => {
     return localStorage.getItem("analytics-consent");
   });
+  const [authReady, setAuthReady] = useState(false);
 
-  // Visitor Analytics
   useEffect(() => {
-    if (analyticsConsent === "accepted" && !hasTrackedPageView.current) {
-      hasTrackedPageView.current = true;
+    if (!authReady) return;
 
-      trackPageView().then((success) => {
-        if (!success) {
-          hasTrackedPageView.current = false;
-        }
-      });
-    }
-  }, [analyticsConsent]);
+    if (isAdmin) return;
+
+    if (analyticsConsent !== "accepted") return;
+
+    if (hasTrackedPageView.current) return;
+
+    hasTrackedPageView.current = true;
+
+    trackPageView().then((success) => {
+      if (!success) {
+        hasTrackedPageView.current = false;
+      }
+    });
+  }, [authReady, isAdmin, analyticsConsent]);
 
   // Authentication check
   useEffect(() => {
@@ -62,7 +70,6 @@ function App() {
 
           setIsAdmin(adminAuthenticated);
 
-          // Restore dashboard only if the session is still an admin session
           if (adminAuthenticated) {
             setShowAdminDashboard(
               sessionStorage.getItem("admin-dashboard-open") === "true",
@@ -83,6 +90,8 @@ function App() {
         setIsAdmin(false);
         setShowAdminDashboard(false);
         sessionStorage.removeItem("admin-dashboard-open");
+      } finally {
+        setAuthReady(true);
       }
     };
 
@@ -205,10 +214,12 @@ function App() {
       />
 
       <Hero />
+      <VisitorCounter />
       <About />
       <Services />
       <Projects />
       <Contact />
+      <PortfolioInsights />
       <Footer />
 
       {analyticsConsent === null && (

@@ -17,7 +17,7 @@ function Hero() {
           </span>
 
           <span className="reveal-line">
-            <span>Experiences.</span>
+            <span>Experiences</span>
           </span>
         </h1>
 
