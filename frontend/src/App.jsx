@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { lazy, Suspense } from "react";
 
 const AdminDashboard = lazy(() => import("./AdminDashboard"));
+const AuthPage = lazy(() => import("./auth/AuthPage"));
 import {
   checkAdminStatus,
   checkAuthProfile,
@@ -16,7 +17,6 @@ import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
 import Projects from "./components/Projects";
-import AuthPage from "./auth/AuthPage";
 import { trackPageView } from "./services/analyticsService";
 import VisitorCounter from "./components/Visitorcounter";
 
