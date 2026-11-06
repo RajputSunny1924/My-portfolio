@@ -188,7 +188,9 @@ function App() {
           ← Back to Portfolio{" "}
         </button>
 
-        <AuthPage onLoginSuccess={handleLoginSuccess} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <AuthPage onLoginSuccess={handleLoginSuccess} />
+        </Suspense>
       </div>
     );
   }

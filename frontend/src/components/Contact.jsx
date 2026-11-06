@@ -78,8 +78,11 @@ function Contact() {
               LinkedIn <span>↗</span>
             </a>
 
-            <a href="/sunny-resume.pdf" download>
-              Download Resume <span>↓</span>
+            <a
+              href="/Sunny-Resume.pdf"
+              download="Sunny-Singh-Resume.pdf"
+              className="resume-btn">
+              Download Resume
             </a>
           </div>
         </div>
