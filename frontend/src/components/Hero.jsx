@@ -66,7 +66,7 @@ function Hero() {
         <div className="hero-profile-glow"></div>
 
         <img
-          src="/sunny-profile.webp"
+          src="/sunny.webp"
           alt="Sunny Singh Rajput"
           className="hero-profile-image"
           loading="eager"
