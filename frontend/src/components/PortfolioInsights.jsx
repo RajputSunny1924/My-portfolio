@@ -266,6 +266,8 @@ function PortfolioInsights() {
             type="text"
             name="website"
             className="review-honeypot"
+            aria-hidden="true"
+            aria-label="Leave this field empty"
             tabIndex="-1"
             autoComplete="off"
             value={form.website}

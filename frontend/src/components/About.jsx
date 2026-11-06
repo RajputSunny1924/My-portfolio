@@ -14,9 +14,9 @@ function About() {
           </h2>
 
           <p>
-            I'm a BSc IT student and Full Stack Developer based in Mumbai,
-            India. I specialize in building modern, responsive websites and
-            secure web applications for businesses and individuals.
+            I'm a Full Stack Developer based in Mumbai, India. I specialize in
+            building modern, responsive websites, secure web applications and
+            AI-powered automation systems for businesses and individuals.
           </p>
         </div>
 
@@ -57,37 +57,44 @@ function About() {
               I'm Sunny Singh,
               <span>
                 {" "}
-                a Developer focused on building real-world applications.
+                a Full Stack Developer who builds reliable software for real
+                businesses.
               </span>
             </h3>
 
             <p>
-              I am a BSc IT student and a Python-focused Full Stack Developer
-              interested in building practical, secure and scalable web
-              applications.
+              I'm a Python-focused Full Stack Developer and freelancer based in
+              Mumbai. I build secure web applications, business websites and
+              AI-powered automation systems, taking each project from the first
+              idea to a working, deployed product.
             </p>
 
             <p>
-              My primary focus is backend development using Python and FastAPI.
-              I work with REST APIs, SQLAlchemy and MySQL, while using React to
-              create interactive frontend experiences.
+              My core strength is backend engineering with Python and FastAPI:
+              REST APIs, database design with SQLAlchemy and MySQL, and secure
+              authentication using JWT, Argon2 password hashing and email OTP
+              verification. On the frontend, I use React to deliver fast,
+              responsive interfaces.
             </p>
 
             <p>
-              I have worked on application features including authentication,
-              email OTP verification, password hashing, JWT authentication,
-              WebSocket communication and database operations.
+              Beyond standard web applications, I build real-time systems with
+              WebSockets and AI automation that takes over repetitive work, such
+              as classifying and processing emails with language models, so
+              businesses can save time and reduce manual effort.
             </p>
 
             <p>
-              I believe in learning through practical implementation. Every
-              project gives me an opportunity to improve my problem-solving
-              ability and understand how real-world applications work.
+              I work the way clients expect a professional to work: I clarify
+              requirements first, communicate clearly at every stage, write
+              clean and maintainable code, and deliver work that is secure, fast
+              and ready for production.
             </p>
 
             <p>
-              My goal is to build digital products that combine functionality,
-              performance and thoughtful design.
+              Whether you need a website that represents your business or a
+              custom system that automates how it runs, I focus on building
+              solutions that are dependable and easy to grow with.
             </p>
           </div>
         </div>

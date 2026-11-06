@@ -213,13 +213,15 @@ function App() {
         onOpenAuth={() => setShowAuthPage(true)}
       />
 
-      <Hero />
-      <VisitorCounter />
-      <About />
-      <Services />
-      <Projects />
-      <Contact />
-      <PortfolioInsights />
+      <main id="main-content">
+        <Hero />
+        <VisitorCounter />
+        <About />
+        <Services />
+        <Projects />
+        <Contact />
+        <PortfolioInsights />
+      </main>
       <Footer />
 
       {analyticsConsent === null && (

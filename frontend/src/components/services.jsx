@@ -41,6 +41,14 @@ const services = [
   },
   {
     number: "06",
+    category: "AI & AUTOMATION",
+    title: "AI Automation Systems",
+    description:
+      "Custom AI-powered systems that automate repetitive work such as email handling, data processing and smart assistants, built around how your business already works.",
+    tags: ["Python", "FastAPI", "AI Integration", "Workflow Automation"],
+  },
+  {
+    number: "07",
     category: "ONGOING TECHNICAL SUPPORT",
     title: "Maintenance & Improvements",
     description:
@@ -65,8 +73,8 @@ function Services() {
           </h2>
           <p>
             I work with individuals and businesses to turn their requirements
-            into practical digital experiences — from websites to complete web
-            applications.
+            into practical digital experiences — from websites and complete web
+            applications to AI-powered automation.
           </p>
         </div>
         <div className="services-list">

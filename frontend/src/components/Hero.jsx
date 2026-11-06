@@ -1,10 +1,10 @@
 function Hero() {
   return (
-    <section id="home" className="hero-section" data-reveal>
+    <section id="home" className="hero-section">
       <div className="hero-copy">
         <p className="hero-kicker">
           <span className="hero-kicker-line"></span>
-          FULL STACK DEVELOPER
+          FULL STACK · AI AUTOMATION
         </p>
 
         <h1 className="hero-heading">
@@ -27,8 +27,10 @@ function Hero() {
 
         <p className="hero-description">
           I'm Sunny Singh Rajput, a Full Stack Developer and Freelance Web
-          Developer based in Mumbai, India. I build modern, responsive websites
-          and custom web applications for businesses and individuals.
+          Developer based in Mumbai, India. I build fast, secure and responsive
+          websites, custom web applications and AI automation systems for
+          businesses and individuals, with clear communication from the first
+          idea to the final delivery.
         </p>
 
         <div className="hero-socials">
@@ -55,12 +57,12 @@ function Hero() {
           </a>
 
           <a href="#contact" className="hero-secondary-btn">
-            Let's Talk
+            Start a Project
           </a>
         </div>
       </div>
 
-      <div className="hero-profile" data-reveal>
+      <div className="hero-profile">
         <div className="hero-profile-glow"></div>
 
         <img
@@ -74,7 +76,7 @@ function Hero() {
         />
       </div>
 
-      <div className="hero-bottom-line" data-reveal>
+      <div className="hero-bottom-line">
         <span>REACT</span>
         <span>PYTHON</span>
         <span>FASTAPI</span>
