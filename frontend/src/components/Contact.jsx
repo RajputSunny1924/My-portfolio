@@ -79,7 +79,7 @@ function Contact() {
             </a>
 
             <a
-              href="/Sunny-Resume.pdf"
+              href="/Sunny-Singh-Resume.pdf"
               download="Sunny-Singh-Resume.pdf"
               className="resume-btn">
               Download Resume
