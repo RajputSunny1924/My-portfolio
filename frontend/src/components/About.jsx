@@ -3,20 +3,19 @@ import Skills from "./Skills";
 function About() {
   return (
     <section id="about" className="about-section">
-      {" "}
       <div className="container">
         {/* SECTION HEADING */}
         <div className="about-heading" data-reveal>
           <span className="section-eyebrow">GET TO KNOW ME</span>
 
           <h2>
-            About <span>Me.</span>
+            About <span>Me</span>
           </h2>
 
           <p>
-            I'm a Full Stack Developer based in Mumbai, India. I specialize in
-            building modern, responsive websites, secure web applications and
-            AI-powered automation systems for businesses and individuals.
+            I'm Sunny Singh Rajput, a freelance Full Stack Developer based in
+            Mumbai, India. I help businesses and individuals build professional
+            websites and custom web applications tailored to their needs.
           </p>
         </div>
 
@@ -24,28 +23,26 @@ function About() {
         <div className="about-grid">
           <div className="about-visual" data-reveal>
             <div className="about-visual-card">
-              <span className="about-card-label">DEVELOPER PROFILE — 001</span>
+              <span className="about-card-label">MY APPROACH </span>
 
               <div className="about-visual-symbol">{"</>"}</div>
 
               <h3>
-                I'm Sunny Singh Rajput,
-                <span>
-                  {" "}
-                  a Full Stack Developer and Freelance Web Developer.
-                </span>
+                More than just code,
+                <span> solutions built around your needs.</span>
               </h3>
+
               <p>
-                I believe great websites are not just about appearance. They
-                should solve problems, deliver value and create meaningful
-                digital experiences.
+                Every project starts with understanding your goals. I focus on
+                choosing the right technology, creating user-friendly
+                experiences and delivering reliable solutions that serve a real
+                purpose.
               </p>
 
               <div className="about-card-bottom">
-                <span>PYTHON</span>
-                <span>REACT</span>
-                <span>FASTAPI</span>
-                <span>MYSQL</span>
+                <span>QUALITY</span>
+                <span>CLARITY</span>
+                <span>RELIABILITY</span>
               </div>
             </div>
           </div>
@@ -54,47 +51,47 @@ function About() {
             <span className="about-intro-label">WHO I AM</span>
 
             <h3>
-              I'm Sunny Singh,
+              Building digital solutions,
               <span>
                 {" "}
-                a Full Stack Developer who builds reliable software for real
-                businesses.
+                with a focus on quality, functionality and real-world needs.
               </span>
             </h3>
 
             <p>
-              I'm a Python-focused Full Stack Developer and freelancer based in
-              Mumbai. I build secure web applications, business websites and
-              AI-powered automation systems, taking each project from the first
-              idea to a working, deployed product.
+              I'm a freelance Full Stack Developer based in Mumbai, India,
+              focused on creating modern websites and custom web applications.
+              My goal is to help businesses establish a strong online presence
+              and simplify their digital workflows through practical technology
+              solutions.
             </p>
 
             <p>
-              My core strength is backend engineering with Python and FastAPI:
-              REST APIs, database design with SQLAlchemy and MySQL, and secure
-              authentication using JWT, Argon2 password hashing and email OTP
-              verification. On the frontend, I use React to deliver fast,
-              responsive interfaces.
+              On the frontend, I work with React, JavaScript and CSS to build
+              responsive, user-friendly interfaces. On the backend, I use Python
+              and FastAPI to develop REST APIs, application logic,
+              authentication systems and database-driven features using MySQL
+              and SQLAlchemy.
             </p>
 
             <p>
-              Beyond standard web applications, I build real-time systems with
-              WebSockets and AI automation that takes over repetitive work, such
-              as classifying and processing emails with language models, so
-              businesses can save time and reduce manual effort.
+              I work with both frontend-only and full-stack architectures. Not
+              every project needs a complex backend or database. I choose the
+              right technology based on the project's actual requirements,
+              functionality and expected scale.
             </p>
 
             <p>
-              I work the way clients expect a professional to work: I clarify
-              requirements first, communicate clearly at every stage, write
-              clean and maintainable code, and deliver work that is secure, fast
-              and ready for production.
+              My approach starts with understanding your requirements. I discuss
+              the project scope, suggest a suitable technical approach, and keep
+              communication clear throughout development. I focus on
+              maintainable code, responsive design and reliable functionality.
             </p>
 
             <p>
-              Whether you need a website that represents your business or a
-              custom system that automates how it runs, I focus on building
-              solutions that are dependable and easy to grow with.
+              Whether you need a business website, a personal portfolio, a
+              custom web application or a suitable automation solution, I aim to
+              deliver a practical solution that fits your goals and budget.
             </p>
           </div>
         </div>

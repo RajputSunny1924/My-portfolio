@@ -1,57 +1,100 @@
 const skills = [
-  { name: "Python", category: "Backend Development", number: "01" },
-  { name: "FastAPI", category: "Backend Framework", number: "02" },
-  { name: "React", category: "Frontend Development", number: "03" },
-  { name: "JavaScript", category: "Programming Language", number: "04" },
-  { name: "MySQL", category: "Database Management", number: "05" },
-  { name: "SQLAlchemy", category: "ORM", number: "06" },
-  { name: "REST API", category: "API Development", number: "07" },
-  { name: "JWT", category: "Authentication", number: "08" },
-  { name: "WebSocket", category: "Real-Time Communication", number: "09" },
-  { name: "Git & GitHub", category: "Version Control", number: "10" },
+  {
+    name: "Python",
+    category: "Backend Programming",
+    number: "01",
+  },
+  {
+    name: "FastAPI",
+    category: "Backend Development",
+    number: "02",
+  },
+  {
+    name: "React",
+    category: "Frontend Development",
+    number: "03",
+  },
+  {
+    name: "JavaScript",
+    category: "Frontend Programming",
+    number: "04",
+  },
+  {
+    name: "MySQL",
+    category: "Database Management",
+    number: "05",
+  },
+  {
+    name: "SQLAlchemy",
+    category: "Database ORM",
+    number: "06",
+  },
+  {
+    name: "REST APIs",
+    category: "API Development",
+    number: "07",
+  },
+  {
+    name: "JWT",
+    category: "Authentication",
+    number: "08",
+  },
+  {
+    name: "WebSockets",
+    category: "Real-Time Applications",
+    number: "09",
+  },
+  {
+    name: "Git & GitHub",
+    category: "Version Control",
+    number: "10",
+  },
 ];
 
 const strengths = [
   {
-    icon: "</>",
+    icon: "◎",
     title: "Problem Solving",
     description:
-      "Breaking complex problems into practical and manageable solutions.",
+      "Understanding project requirements and breaking complex problems into practical, maintainable solutions.",
   },
   {
     icon: "✳",
-    title: "Continuous Learning",
+    title: "Requirement-Based Development",
     description:
-      "Improving technical knowledge through consistent hands-on practice.",
+      "Choosing suitable technologies and development approaches based on each project's actual needs.",
   },
   {
-    icon: "◎",
-    title: "Clean Development",
+    icon: "◇",
+    title: "Clean & Maintainable Code",
     description:
-      "Writing structured code that is easier to understand and maintain.",
+      "Writing structured, organized code that is easier to understand, maintain and improve.",
   },
   {
     icon: "↗",
-    title: "Growth Mindset",
+    title: "Continuous Improvement",
     description:
-      "Learning from every project and continuously improving my approach.",
+      "Applying hands-on learning and practical experience to improve development quality and technical skills.",
   },
 ];
 
 function Skills() {
   return (
     <div className="skills-section">
-      {" "}
+      {/* TECHNICAL SKILLS */}
       <div className="skills-heading" data-reveal>
-        {" "}
-        <span className="section-eyebrow">MY TECH STACK / 01</span>
+        <span className="section-eyebrow">TECHNICAL SKILLS / 01</span>
+
         <h3>
           Technologies I <span>Work With.</span>
         </h3>
+
         <p>
-          The tools and technologies I use to build functional web applications.
+          My technical toolkit for frontend development, backend engineering,
+          database integration and building modern web applications.
         </p>
       </div>
+
       <div className="skills-grid">
         {skills.map((skill, index) => (
           <div
@@ -72,24 +115,30 @@ function Skills() {
           </div>
         ))}
       </div>
+
+      {/* DEVELOPMENT EXPERTISE */}
       <div className="development-focus" data-reveal>
         <div>
-          <span className="section-eyebrow">MY EXPERTISE / 02</span>
+          <span className="section-eyebrow">DEVELOPMENT EXPERTISE / 02</span>
 
           <h3>
-            What I <span>Focus On.</span>
+            What I <span>Build.</span>
           </h3>
         </div>
 
         <div className="focus-tags">
-          <span>Python Backend Development</span>
-          <span>Full Stack Web Development</span>
-          <span>Secure Authentication</span>
+          <span>Frontend Development</span>
+          <span>Backend Development</span>
+          <span>Full Stack Web Applications</span>
           <span>REST API Development</span>
           <span>Database Integration</span>
+          <span>Authentication Systems</span>
           <span>Real-Time Applications</span>
+          <span>AI Integration</span>
         </div>
       </div>
+
+      {/* DEVELOPMENT APPROACH */}
       <div className="strengths-section">
         <div className="skills-heading" data-reveal>
           <span className="section-eyebrow">MY APPROACH / 03</span>
@@ -99,8 +148,9 @@ function Skills() {
           </h3>
 
           <p>
-            Good development is not only about writing code. It is also about
-            how problems are understood and solved.
+            Effective web development starts with understanding the problem. I
+            focus on clear requirements, practical solutions and maintainable
+            development.
           </p>
         </div>
 

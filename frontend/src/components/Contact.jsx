@@ -1,27 +1,31 @@
 function Contact() {
   return (
     <section id="contact" className="contact-section">
-      {" "}
       <div className="container">
-        {" "}
         <div className="contact-heading" data-reveal>
-          {" "}
           <span className="section-eyebrow">HAVE A PROJECT IN MIND?</span>
+
           <h2>
             Let's build
             <br />
             <span>something meaningful.</span>
           </h2>
+
           <p>
-            Have an idea, need a website or looking for a developer to
-            collaborate with? Tell me what you're planning. Let's discuss it.
+            Looking for a professional website or a custom web application?
+            Share your requirements with me. Let's discuss your idea and find
+            the right solution for your project.
           </p>
+
           <a
-            href="mailto:sunnysinghforeverat@gmail.com?subject=Project%20Inquiry"
-            className="contact-main-button">
-            Start a Conversation <span>↗</span>
+            href="https://wa.me/917350288505?text=Hi%20Sunny%2C%20I%20visited%20your%20portfolio%20and%20would%20like%20to%20discuss%20a%20project."
+            className="contact-main-button"
+            target="_blank"
+            rel="noopener noreferrer">
+            Discuss Your Project <span>↗</span>
           </a>
         </div>
+
         <div className="contact-content">
           <div className="contact-info" data-reveal>
             <span className="contact-small-label">CONTACT DETAILS</span>
@@ -86,6 +90,7 @@ function Contact() {
             </a>
           </div>
         </div>
+
         <div className="contact-bottom" data-reveal>
           <span>OPEN TO FREELANCE PROJECTS & COLLABORATIONS</span>
           <span>LET'S CREATE SOMETHING GREAT.</span>

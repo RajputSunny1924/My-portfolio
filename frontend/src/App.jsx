@@ -184,6 +184,10 @@ function App() {
             zIndex: 9999,
             padding: "10px 18px",
             cursor: "pointer",
+            background: "transparent",
+            color: "#ffffff",
+            border: "1px solid rgba(255,255,255,0.25)",
+            borderRadius: "8px",
           }}>
           ← Back to Portfolio{" "}
         </button>

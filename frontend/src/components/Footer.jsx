@@ -1,7 +1,14 @@
 function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer>
-      <p>© 2026 Sunny Singh. All rights reserved.</p>
+    <footer className="footer">
+      <p>
+        © {currentYear} <span>Sunny Singh Rajput</span>. All rights reserved.
+      </p>
+      <p className="footer-tagline">
+        Freelance Full Stack Developer · Mumbai, India
+      </p>
     </footer>
   );
 }
