@@ -454,8 +454,8 @@ button[aria-disabled="true"] {
 
 [data-reveal].is-visible {
   opacity: 1;
-  animation: revealUp 0.9s var(--ease-out) backwards;
-  animation-delay: calc(var(--skill-index, 0) * 35ms);
+  animation: revealUp 0.5s var(--ease-out) backwards;
+  animation-delay: calc(var(--skill-index, 0) * 15ms);
 }
 
 .reveal-line {
@@ -468,8 +468,8 @@ button[aria-disabled="true"] {
   transform: translateY(110%);
   opacity: 0;
   transition:
-    transform 1s var(--ease-out),
-    opacity 0.8s ease;
+    transform 0.5s var(--ease-out),
+    opacity 0.4s ease;
 }
 
 .is-visible .reveal-line > span {
@@ -478,13 +478,26 @@ button[aria-disabled="true"] {
 }
 
 .reveal-line:nth-child(1) > span {
-  transition-delay: 0.1s;
+  transition-delay: 0.05s;
 }
+
 .reveal-line:nth-child(2) > span {
-  transition-delay: 0.25s;
+  transition-delay: 0.12s;
 }
+
 .reveal-line:nth-child(3) > span {
-  transition-delay: 0.4s;
+  transition-delay: 0.19s;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  .reveal-line > span {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
 }
 
 @media (scripting: none) {
@@ -494,7 +507,6 @@ button[aria-disabled="true"] {
     transform: none;
   }
 }
-
 /* =========================================
    08. NAVBAR + ACCOUNT MENU
    ========================================= */
@@ -918,23 +930,19 @@ nav h2 {
 
   animation: profileReveal 1.2s 0.3s ease both;
 }
-
 .hero-profile-glow {
   position: absolute;
   inset: -8%;
-
   background: radial-gradient(
     ellipse at center,
-    rgba(149, 133, 255, 0.18) 0%,
-    rgba(149, 133, 255, 0.08) 40%,
+    rgba(149, 133, 255, 0.14) 0%,
+    rgba(149, 133, 255, 0.06) 40%,
     rgba(149, 133, 255, 0) 70%
   );
   border-radius: 50%;
   pointer-events: none;
-
-  will-change: transform;
-  animation: subtleGlow 5s ease-in-out infinite alternate;
-  transition: opacity 0.6s ease;
+  opacity: 1;
+  transform: translateZ(0);
 }
 
 .hero-profile:hover .hero-profile-glow {
