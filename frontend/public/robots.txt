@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://my-portfolio-h5de.onrender.com/sitemap.xml
+Sitemap: https://sunnysingh.is-a.dev/sitemap.xml

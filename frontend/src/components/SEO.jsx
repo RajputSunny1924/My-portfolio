@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE_URL = "https://my-portfolio-h5de.onrender.com";
+const SITE_URL = "https://sunnysingh.is-a.dev";
 const DEFAULT_IMAGE = `${SITE_URL}/sunny.webp`;
 
 function SEO({ title, description, path = "/" }) {
