@@ -1,5 +1,3 @@
-import projects from "../data/projects";
-
 const projectConfig = [
   {
     title: "Private Chat Application",
@@ -22,34 +20,24 @@ const projectConfig = [
     technologies: ["React", "FastAPI", "MySQL", "WebSocket", "JWT"],
   },
   {
-    title: "Developer Portfolio & Authentication System",
+    title: "Developer Portfolio Website",
     image:
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=85",
-    imageAlt: "Temporary developer portfolio preview",
-    category: "FULL STACK WEB APPLICATION",
+    imageAlt: "Developer portfolio website preview",
+    category: "FRONTEND WEB DEVELOPMENT",
     url: "https://my-portfolio-h5de.onrender.com/",
     description:
-      "My personal developer portfolio, built to showcase my work, skills and services. The application also includes a full-stack authentication system with email verification and security-focused backend functionality.",
+      "My personal portfolio website, designed to showcase my projects, technical skills and freelance services. Built with React and modern CSS, it features a responsive layout, smooth interactions and a clean user experience.",
     highlights: [
-      "User registration and login",
-      "Email OTP verification and resend",
-      "Argon2 password hashing",
-      "JWT authentication with HttpOnly cookies",
-      "CSRF protection and protected APIs",
-      "QR-based access flow",
-      "Admin dashboard and analytics",
-      "React frontend with Python FastAPI backend",
+      "Responsive portfolio design",
+      "Personal introduction and skills showcase",
+      "Project showcase with live links",
+      "Freelance services presentation",
+      "Direct email, phone and WhatsApp contact",
+      "SEO-friendly page structure",
+      "Mobile-friendly user experience",
     ],
-    technologies: [
-      "React",
-      "Python",
-      "FastAPI",
-      "MySQL",
-      "SQLAlchemy",
-      "Argon2",
-      "JWT",
-      "OTP Verification",
-    ],
+    technologies: ["React", "JavaScript", "CSS", "Vite"],
   },
 ];
 
@@ -74,12 +62,6 @@ function Projects() {
         </div>
         <div className="projects-showcase">
           {projectConfig.map((config, index) => {
-            const projectData = projects.find((project) =>
-              project.title === "Full Stack Authentication Project"
-                ? index === 1
-                : project.title === config.title,
-            );
-
             return (
               <article
                 className={`project-case ${

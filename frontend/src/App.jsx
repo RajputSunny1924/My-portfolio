@@ -1,15 +1,8 @@
-import { useEffect, useState, useRef } from "react";
-import { lazy, Suspense } from "react";
+import SEO from "./components/SEO";
 
-const AdminDashboard = lazy(() => import("./AdminDashboard"));
-const AuthPage = lazy(() => import("./auth/AuthPage"));
-import {
-  checkAdminStatus,
-  checkAuthProfile,
-  getCsrfToken,
-  logoutUser,
-} from "./auth/authService";
-import PortfolioInsights from "./components/PortfolioInsights";
+import { useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+
 import Services from "./components/services";
 import About from "./components/About";
 import Contact from "./components/Contact";
@@ -17,88 +10,13 @@ import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
 import Projects from "./components/Projects";
-import { trackPageView } from "./services/analyticsService";
-import VisitorCounter from "./components/Visitorcounter";
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+// services
+import Offers from "./pages/offers";
+import Pricing from "./pages/pricing";
+import Terms from "./pages/terms";
 
-  // Restore dashboard state after page refresh
-  const [showAdminDashboard, setShowAdminDashboard] = useState(
-    () => sessionStorage.getItem("admin-dashboard-open") === "true",
-  );
-
-  const [showAuthPage, setShowAuthPage] = useState(false);
-
-  const hasTrackedPageView = useRef(false);
-
-  const [analyticsConsent, setAnalyticsConsent] = useState(() => {
-    return localStorage.getItem("analytics-consent");
-  });
-  const [authReady, setAuthReady] = useState(false);
-
-  useEffect(() => {
-    if (!authReady) return;
-
-    if (isAdmin) return;
-
-    if (analyticsConsent !== "accepted") return;
-
-    if (hasTrackedPageView.current) return;
-
-    hasTrackedPageView.current = true;
-
-    trackPageView().then((success) => {
-      if (!success) {
-        hasTrackedPageView.current = false;
-      }
-    });
-  }, [authReady, isAdmin, analyticsConsent]);
-
-  // Authentication check
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await checkAuthProfile();
-
-        if (response.ok) {
-          setIsLoggedIn(true);
-
-          const adminResponse = await checkAdminStatus();
-          const adminAuthenticated = adminResponse.ok;
-
-          setIsAdmin(adminAuthenticated);
-
-          if (adminAuthenticated) {
-            setShowAdminDashboard(
-              sessionStorage.getItem("admin-dashboard-open") === "true",
-            );
-          } else {
-            setShowAdminDashboard(false);
-            sessionStorage.removeItem("admin-dashboard-open");
-          }
-        } else {
-          setIsLoggedIn(false);
-          setIsAdmin(false);
-          setShowAdminDashboard(false);
-          sessionStorage.removeItem("admin-dashboard-open");
-        }
-      } catch (error) {
-        console.error("Authentication check failed:", error);
-        setIsLoggedIn(false);
-        setIsAdmin(false);
-        setShowAdminDashboard(false);
-        sessionStorage.removeItem("admin-dashboard-open");
-      } finally {
-        setAuthReady(true);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  // Repeatable Scroll Reveal Observer
+function HomePage() {
   useEffect(() => {
     const revealItems = document.querySelectorAll("[data-reveal]");
 
@@ -119,146 +37,74 @@ function App() {
     );
 
     revealItems.forEach((item) => observer.observe(item));
+
     return () => observer.disconnect();
-  }, [showAdminDashboard, showAuthPage]);
+  }, []);
 
-  // Logout
-  const handleLogout = async () => {
-    try {
-      const csrfResponse = await getCsrfToken();
-
-      if (!csrfResponse.ok) {
-        console.error("CSRF fetch failed:", csrfResponse.status);
-        return;
-      }
-
-      const csrfData = await csrfResponse.json();
-      const response = await logoutUser(csrfData.csrf_token);
-
-      if (!response.ok) {
-        console.error("Logout failed:", response.status);
-        return;
-      }
-
-      setIsLoggedIn(false);
-      setIsAdmin(false);
-      setShowAdminDashboard(false);
-
-      sessionStorage.removeItem("admin-dashboard-open");
-
-      console.log("Logout successful");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
-
-  // Login success callback
-  const handleLoginSuccess = ({ isAdmin: adminStatus }) => {
-    setIsLoggedIn(true);
-    setIsAdmin(adminStatus);
-    setShowAuthPage(false);
-  };
-
-  // Open Admin Dashboard
-  const handleOpenAdminDashboard = () => {
-    sessionStorage.setItem("admin-dashboard-open", "true");
-    setShowAdminDashboard(true);
-  };
-
-  // Back to Portfolio
-  const handleBackToPortfolio = () => {
-    sessionStorage.removeItem("admin-dashboard-open");
-    setShowAdminDashboard(false);
-  };
-
-  if (showAuthPage) {
-    return (
-      <div>
-        <button
-          type="button"
-          onClick={() => setShowAuthPage(false)}
-          style={{
-            position: "fixed",
-            top: "20px",
-            right: "25px",
-            zIndex: 9999,
-            padding: "10px 18px",
-            cursor: "pointer",
-            background: "transparent",
-            color: "#ffffff",
-            border: "1px solid rgba(255,255,255,0.25)",
-            borderRadius: "8px",
-          }}>
-          ← Back to Portfolio{" "}
-        </button>
-
-        <Suspense fallback={<div>Loading...</div>}>
-          <AuthPage onLoginSuccess={handleLoginSuccess} />
-        </Suspense>
-      </div>
-    );
-  }
-
-  // Admin Dashboard
-  if (isAdmin && showAdminDashboard) {
-    return (
-      <Suspense fallback={<div>Loading dashboard...</div>}>
-        <AdminDashboard onBackToPortfolio={handleBackToPortfolio} />
-      </Suspense>
-    );
-  }
-
-  // Public Portfolio
   return (
-    <div className="portfolio-shell">
-      <Navbar
-        isLoggedIn={isLoggedIn}
-        isAdmin={isAdmin}
-        onOpenAdminDashboard={handleOpenAdminDashboard}
-        onLogout={handleLogout}
-        onOpenAuth={() => setShowAuthPage(true)}
+    <>
+      <SEO
+        title="Sunny Singh Rajput | Full Stack Developer & Freelance Web Developer"
+        description="Sunny Singh Rajput is a Full Stack and Freelance Web Developer in Mumbai, India. Explore my web development projects, skills and services."
+        path="/"
       />
 
       <main id="main-content">
         <Hero />
-        <VisitorCounter />
         <About />
         <Services />
         <Projects />
         <Contact />
-        <PortfolioInsights />
       </main>
+    </>
+  );
+}
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const target = document.getElementById(hash.slice(1));
+
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+    }
+
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname, hash]);
+
+  return null;
+}
+
+function App() {
+  return (
+    <div className="portfolio-shell">
+      <ScrollToTop />
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/offers" element={<Offers />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route
+          path="*"
+          element={
+            <main className="container offers-empty">
+              <h1>Page Not Found</h1>
+              <p>The page you are looking for does not exist.</p>
+              <a href="/" className="btn btn-primary">
+                Return to Homepage
+              </a>
+            </main>
+          }
+        />
+      </Routes>
+
       <Footer />
-
-      {analyticsConsent === null && (
-        <div className="analytics-consent-banner">
-          <div>
-            <strong>Privacy & Analytics</strong>
-            <p>
-              We use anonymous analytics to understand website visits and
-              improve your experience. No personal identity is collected.
-            </p>
-          </div>
-
-          <div className="analytics-consent-actions">
-            <button
-              onClick={() => {
-                localStorage.setItem("analytics-consent", "accepted");
-                setAnalyticsConsent("accepted");
-              }}>
-              Accept
-            </button>
-
-            <button
-              onClick={() => {
-                localStorage.setItem("analytics-consent", "declined");
-                setAnalyticsConsent("declined");
-              }}>
-              Decline
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,76 +1,59 @@
 import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 
-function Navbar({
-  isLoggedIn,
-  isAdmin,
-  onOpenAdminDashboard,
-  onOpenAuth,
-  onLogout,
-}) {
+function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleAuthClick = () => {
-    setMenuOpen(false);
-
-    if (onOpenAuth) {
-      onOpenAuth();
-    }
-  };
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <nav>
-      <h2>My Portfolio</h2>
+    <nav className="main-navbar" aria-label="Main navigation">
+      <Link
+        to="/"
+        className="navbar-brand"
+        aria-label="Sunny Singh Rajput homepage"
+        onClick={closeMenu}>
+        <h2>My Portfolio</h2>
+      </Link>
 
-      <div className="nav-links">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
+      <button
+        type="button"
+        className={`navbar-toggle ${menuOpen ? "active" : ""}`}
+        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={menuOpen}
+        aria-controls="primary-navigation"
+        onClick={() => setMenuOpen(!menuOpen)}>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
-        <div className="menu-container">
-          <button
-            type="button"
-            className="menu-toggle"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label="Open account menu"
-            aria-expanded={menuOpen}>
-            ⋮
-          </button>
+      <div
+        id="primary-navigation"
+        className={`nav-links ${menuOpen ? "is-open" : ""}`}>
+        <Link to="/#home" onClick={closeMenu}>
+          Home
+        </Link>
+        <Link to="/#about" onClick={closeMenu}>
+          About
+        </Link>
+        <Link to="/#projects" onClick={closeMenu}>
+          Projects
+        </Link>
 
-          {menuOpen && (
-            <div className="dropdown-menu">
-              {!isLoggedIn && (
-                <>
-                  <button type="button" onClick={handleAuthClick}>
-                    Login / Register
-                  </button>
-                </>
-              )}
+        <Link to="/offers" className="offers-nav-link" onClick={closeMenu}>
+          Offers <span>NEW</span>
+        </Link>
 
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onOpenAdminDashboard?.();
-                    setMenuOpen(false);
-                  }}>
-                  ⚙️ Admin Dashboard
-                </button>
-              )}
-
-              {isLoggedIn && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onLogout?.();
-                  }}>
-                  🚪 Logout
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+        <NavLink to="/pricing" onClick={closeMenu}>
+          Pricing
+        </NavLink>
+        <NavLink to="/terms" onClick={closeMenu}>
+          Terms
+        </NavLink>
+        <Link to="/#contact" onClick={closeMenu}>
+          Contact
+        </Link>
       </div>
     </nav>
   );
