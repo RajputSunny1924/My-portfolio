@@ -1,53 +1,29 @@
-const skills = [
+
+const skillGroups = [
   {
-    name: "Python",
-    category: "Backend Programming",
-    number: "01",
+    title: "Programming Languages",
+    description: "Languages I use to develop web applications and application logic.",
+    skills: ["Python", "JavaScript", "HTML5", "CSS3"],
   },
   {
-    name: "FastAPI",
-    category: "Backend Development",
-    number: "02",
+    title: "Frameworks & Development",
+    description: "Technologies used to build frontend and backend applications.",
+    skills: ["React", "FastAPI", "REST APIs", "WebSockets"],
   },
   {
-    name: "React",
-    category: "Frontend Development",
-    number: "03",
+    title: "Database & Backend",
+    description: "Database handling, ORM and backend application functionality.",
+    skills: ["MySQL", "SQLAlchemy", "JWT Authentication"],
   },
   {
-    name: "JavaScript",
-    category: "Frontend Programming",
-    number: "04",
+    title: "Developer Tools",
+    description: "Tools used for coding, development, version control and project management.",
+    skills: ["VS Code", "Git", "GitHub"],
   },
   {
-    name: "MySQL",
-    category: "Database Management",
-    number: "05",
-  },
-  {
-    name: "SQLAlchemy",
-    category: "Database ORM",
-    number: "06",
-  },
-  {
-    name: "REST APIs",
-    category: "API Development",
-    number: "07",
-  },
-  {
-    name: "JWT",
-    category: "Authentication",
-    number: "08",
-  },
-  {
-    name: "WebSockets",
-    category: "Real-Time Applications",
-    number: "09",
-  },
-  {
-    name: "Git & GitHub",
-    category: "Version Control",
-    number: "10",
+    title: "AI Tools & Workflow",
+    description: "AI tools I use for research, coding assistance, debugging and development workflows.",
+    skills: ["ChatGPT", "Google Gemini", "Antigravity", "Ollama"],
   },
 ];
 
@@ -80,50 +56,68 @@ const strengths = [
 
 function Skills() {
   return (
-    <div className="skills-section">
+    <section className="skills-section" aria-labelledby="skills-title">
       {/* TECHNICAL SKILLS */}
       <div className="skills-heading" data-reveal>
-        <span className="section-eyebrow">TECHNICAL SKILLS / 01</span>
+        <span className="section-eyebrow">
+          TECHNICAL SKILLS / 01
+        </span>
 
-        <h3>
+        <h2 id="skills-title">
           Technologies I <span>Work With.</span>
-        </h3>
+        </h2>
 
         <p>
-          My technical toolkit for frontend development, backend engineering,
-          database integration and building modern web applications.
+          Technologies, development tools and AI-assisted workflows
+          I use to build, improve and maintain modern web applications.
         </p>
       </div>
 
       <div className="skills-grid">
-        {skills.map((skill, index) => (
-          <div
+        {skillGroups.map((group, index) => (
+          <article
             className="skill-card"
-            key={skill.name}
+            key={group.title}
             data-reveal
-            style={{ "--skill-index": index }}>
-            <span className="skill-number">{skill.number}</span>
+            style={{ "--skill-index": index }}
+          >
+            <span className="skill-number">
+              {String(index + 1).padStart(2, "0")}
+            </span>
 
             <div className="skill-info">
-              <h4>{skill.name}</h4>
-              <span>{skill.category}</span>
+              <h3>{group.title}</h3>
+
+              <p className="skill-description">
+                {group.description}
+              </p>
+
+              <div className="skill-tags">
+                {group.skills.map((skill) => (
+                  <span className="skill-tag" key={skill}>
+                    {skill}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <span className="skill-arrow" aria-hidden="true">
               ↗
             </span>
-          </div>
+          </article>
         ))}
       </div>
 
       {/* DEVELOPMENT EXPERTISE */}
       <div className="development-focus" data-reveal>
         <div>
-          <span className="section-eyebrow">DEVELOPMENT EXPERTISE / 02</span>
+          <span className="section-eyebrow">
+            DEVELOPMENT EXPERTISE / 02
+          </span>
 
-          <h3>
+          <h2>
             What I <span>Build.</span>
-          </h3>
+          </h2>
         </div>
 
         <div className="focus-tags">
@@ -141,36 +135,41 @@ function Skills() {
       {/* DEVELOPMENT APPROACH */}
       <div className="strengths-section">
         <div className="skills-heading" data-reveal>
-          <span className="section-eyebrow">MY APPROACH / 03</span>
+          <span className="section-eyebrow">
+            MY APPROACH / 03
+          </span>
 
-          <h3>
+          <h2>
             Beyond the <span>Code.</span>
-          </h3>
+          </h2>
 
           <p>
-            Effective web development starts with understanding the problem. I
-            focus on clear requirements, practical solutions and maintainable
-            development.
+            Effective web development starts with understanding
+            the problem. I focus on clear requirements, practical
+            solutions and maintainable development.
           </p>
         </div>
 
         <div className="about-strengths">
           {strengths.map((item, index) => (
-            <div
+            <article
               className="strength-card"
               key={item.title}
               data-reveal
-              style={{ "--skill-index": index }}>
-              <div className="strength-icon">{item.icon}</div>
+              style={{ "--skill-index": index }}
+            >
+              <div className="strength-icon" aria-hidden="true">
+                {item.icon}
+              </div>
 
-              <h4>{item.title}</h4>
+              <h3>{item.title}</h3>
 
               <p>{item.description}</p>
-            </div>
+            </article>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
