@@ -21,11 +21,10 @@ const projectConfig = [
   },
   {
     title: "Developer Portfolio Website",
-    image:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=85",
+    image: "/assets/portfolio_img.jpg",
     imageAlt: "Developer portfolio website preview",
     category: "FRONTEND WEB DEVELOPMENT",
-    url: "https://my-portfolio-h5de.onrender.com/",
+    url: "https://sunnysingh.is-a.dev/",
     description:
       "My personal portfolio website, designed to showcase my projects, technical skills and freelance services. Built with React and modern CSS, it features a responsive layout, smooth interactions and a clean user experience.",
     highlights: [
@@ -36,6 +35,26 @@ const projectConfig = [
       "Direct email, phone and WhatsApp contact",
       "SEO-friendly page structure",
       "Mobile-friendly user experience",
+    ],
+    technologies: ["React", "JavaScript", "CSS", "Vite"],
+  },
+
+  {
+    title: "My Choice Shop – Catalogue Website",
+    image: "/assets/catalogue_img.jpg",
+    imageAlt: "My Choice Shop online clothing catalogue preview",
+    category: "E-COMMERCE / PRODUCT CATALOGUE",
+    url: "https://my-choice-shop.netlify.app/",
+    description:
+      "A responsive clothing catalogue website designed to showcase fashion products with an organized shopping experience. It features product listings, category-based browsing, product detail pages, pricing, and a modern mobile-friendly interface.",
+    highlights: [
+      "Responsive clothing catalogue",
+      "Category-based product browsing",
+      "Individual product detail pages",
+      "Product pricing and discount display",
+      "Modern and mobile-friendly design",
+      "Product navigation using URL slugs",
+      "Frontend-based product catalogue",
     ],
     technologies: ["React", "JavaScript", "CSS", "Vite"],
   },
