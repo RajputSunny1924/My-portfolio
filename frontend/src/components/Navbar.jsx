@@ -54,6 +54,12 @@ function Navbar() {
         <Link to="/#contact" onClick={closeMenu}>
           Contact
         </Link>
+        <Link
+          to="/#project-inquiry"
+          className="nav-project-button"
+          onClick={closeMenu}>
+          Start a Project <span>↗</span>
+        </Link>
       </div>
     </nav>
   );

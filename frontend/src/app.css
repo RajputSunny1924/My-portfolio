@@ -2339,17 +2339,6 @@ footer p:hover {
 
 /* Bottom CTA */
 
-.contact-bottom {
-  margin-top: 65px;
-  padding: 25px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  border-top: 1px solid var(--border-primary);
-  border-bottom: 1px solid var(--border-primary);
-}
-
 .contact-bottom span {
   color: var(--text-muted);
   font-size: 10px;
@@ -3174,7 +3163,6 @@ footer p:hover {
   }
 }
 
-
 /* =========================================
    SKILLS SECTION - UPDATED VISUAL DESIGN
 ========================================= */
@@ -3217,11 +3205,7 @@ footer p:hover {
   padding: 26px;
   overflow: hidden;
 
-  background: linear-gradient(
-    145deg,
-    #14151a,
-    #101115
-  );
+  background: linear-gradient(145deg, #14151a, #101115);
 
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
@@ -3237,11 +3221,7 @@ footer p:hover {
 .skills-grid .skill-card:hover {
   transform: translateY(-5px);
   border-color: rgba(149, 133, 255, 0.35);
-  background: linear-gradient(
-    145deg,
-    #191a21,
-    #121318
-  );
+  background: linear-gradient(145deg, #191a21, #121318);
 }
 
 /* Card number */
@@ -3528,7 +3508,6 @@ footer p:hover {
   }
 }
 
-
 /* =========================================
    DEVELOPMENT EXPERTISE - REFINED
 ========================================= */
@@ -3589,5 +3568,317 @@ footer p:hover {
   .development-focus .focus-tags span {
     padding: 9px 12px;
     font-size: 12px;
+  }
+}
+
+/* =========================================
+   PROJECT INQUIRY FORM
+========================================= */
+
+.project-inquiry-wrapper {
+  max-width: 850px;
+  margin: 0 auto 90px;
+  padding: 40px;
+  border: 1px solid var(--border-primary);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  scroll-margin-top: 120px;
+}
+
+.project-inquiry-heading {
+  margin-bottom: 30px;
+}
+
+.project-inquiry-heading h3 {
+  font-size: clamp(24px, 3vw, 35px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+}
+
+.project-inquiry-heading p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.project-inquiry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.inquiry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inquiry-field label {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.inquiry-field label span {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.inquiry-field input,
+.inquiry-field select,
+.inquiry-field textarea {
+  width: 100%;
+  padding: 15px 16px;
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  outline: none;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.inquiry-field input::placeholder,
+.inquiry-field textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.inquiry-field select {
+  cursor: pointer;
+}
+
+.inquiry-field select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.inquiry-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.inquiry-field input:focus,
+.inquiry-field select:focus,
+.inquiry-field textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(149, 133, 255, 0.12);
+}
+
+.inquiry-submit-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--glass-accent-border);
+  border-radius: 12px;
+  background: var(--glass-accent-bg);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.inquiry-submit-button:hover {
+  transform: translateY(-3px);
+  background: var(--glass-accent-bg-hover);
+  box-shadow: 0 10px 30px rgba(149, 133, 255, 0.12);
+}
+
+.inquiry-form-note {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* Inquiry form responsiveness */
+
+@media (max-width: 700px) {
+  .project-inquiry-wrapper {
+    padding: 25px 20px;
+    margin-bottom: 55px;
+    border-radius: 18px;
+  }
+
+  .project-inquiry-form {
+    gap: 18px;
+  }
+
+  .inquiry-field input,
+  .inquiry-field select,
+  .inquiry-field textarea {
+    padding: 14px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .project-inquiry-wrapper {
+    padding: 20px 16px;
+  }
+
+  .inquiry-submit-button {
+    padding: 14px;
+    font-size: 13px;
+  }
+}
+
+/* NAVBAR PROJECT CTA */
+
+.main-navbar .nav-links .nav-project-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border: 1px solid var(--glass-accent-border);
+  border-radius: 10px;
+  background: var(--glass-accent-bg);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.main-navbar .nav-links .nav-project-button:hover {
+  background: var(--glass-accent-bg-hover);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.main-navbar .nav-links .nav-project-button span {
+  color: var(--accent-primary);
+}
+
+@media (max-width: 768px) {
+  .main-navbar .nav-links .nav-project-button {
+    justify-content: space-between;
+  }
+}
+/* =========================================
+   CONTACT - TWO COLUMN LAYOUT
+========================================= */
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  align-items: start;
+  gap: 60px;
+  margin-top: 50px;
+}
+
+/* LEFT COLUMN */
+
+.contact-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+}
+
+.contact-left-column .contact-info,
+.contact-left-column .contact-socials {
+  width: 100%;
+}
+
+/* RIGHT SIDE FORM */
+
+.contact-layout .project-inquiry-wrapper {
+  width: 100%;
+  max-width: 520px;
+  margin: 0;
+  padding: 30px;
+  border: 1px solid var(--border-primary);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.contact-layout .project-inquiry-heading {
+  margin-bottom: 25px;
+}
+
+.contact-layout .project-inquiry-heading h3 {
+  font-size: 28px;
+  margin: 10px 0;
+}
+
+.contact-layout .project-inquiry-heading p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.contact-layout .project-inquiry-form {
+  gap: 17px;
+}
+
+.contact-layout .inquiry-field {
+  gap: 8px;
+}
+
+.contact-layout .inquiry-field label {
+  font-size: 12px;
+}
+
+.contact-layout .inquiry-field input,
+.contact-layout .inquiry-field select,
+.contact-layout .inquiry-field textarea {
+  padding: 13px 14px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.contact-layout .inquiry-field textarea {
+  min-height: 90px;
+}
+
+.contact-layout .inquiry-submit-button {
+  padding: 14px;
+  font-size: 13px;
+}
+
+.contact-layout .inquiry-form-note {
+  font-size: 11px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .contact-layout {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .contact-layout .project-inquiry-wrapper {
+    max-width: 100%;
+    padding: 25px;
+  }
+}
+
+@media (max-width: 700px) {
+  .contact-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .contact-left-column {
+    gap: 35px;
+  }
+
+  .contact-layout .project-inquiry-wrapper {
+    max-width: 100%;
+    padding: 24px 20px;
+  }
+
+  .contact-layout .project-inquiry-heading h3 {
+    font-size: 25px;
   }
 }
