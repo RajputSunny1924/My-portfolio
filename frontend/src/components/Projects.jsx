@@ -58,6 +58,25 @@ const projectConfig = [
     ],
     technologies: ["React", "JavaScript", "CSS", "Vite"],
   },
+  {
+    title: "Sukoon Cafe – Restaurant Website Demo",
+    image: "/assets/cafe_img.jpg",
+    imageAlt: "Sukoon Cafe restaurant website preview",
+    category: "RESTAURANT / CAFE WEBSITE",
+    url: "https://sukkonscafe.netlify.app/",
+    description:
+      "A modern and visually appealing cafe website designed to showcase the cafe's atmosphere, menu, and offerings. It features a responsive layout, elegant design, intuitive navigation, and a customer-friendly experience across mobile and desktop devices.",
+    highlights: [
+      "Responsive cafe website design",
+      "Modern and elegant user interface",
+      "Cafe menu presentation",
+      "Mobile-friendly layout",
+      "User-friendly navigation",
+      "Business contact information",
+      "Restaurant-focused website experience",
+    ],
+    technologies: ["React", "JavaScript", "CSS", "Vite"],
+  },
 ];
 
 function Projects() {
